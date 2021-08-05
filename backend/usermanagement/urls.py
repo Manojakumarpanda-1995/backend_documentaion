@@ -16,7 +16,7 @@ urlpatterns = [
     # #Validate token	
     path('check-token', views.check_token.as_view(),name="check-token"),	
     # # Email verification
-    path('validate-emailid', views.validate_emailid.as_view(),name="validate-emailid"), #GET REQUEST
+    # path('validate-emailid', views.validate_emailid.as_view(),name="validate-emailid"), #GET REQUEST
     # File upload / download	
     # path('upload-file', views.upload_file.as_view(),name="upload-file"),
     path('download-file', views.download_file.as_view(),name="download-file"),

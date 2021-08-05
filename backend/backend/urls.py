@@ -33,7 +33,7 @@ urlpatterns = [
     # url(r'^$', RedirectView.as_view(url='login')),
     url(r'^login$', TemplateView.as_view(template_name='login.html')),
     path("access/",include("usermanagement.urls"),name="usermanagement"),
-    # path("org/",include("organization.urls"),name="organization"),
+    path("org/",include("organization.urls"),name="organization"),
     # path("project/",include("project.urls"),name="project"),
     
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

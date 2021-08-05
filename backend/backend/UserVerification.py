@@ -13,7 +13,7 @@ class CheckToken:
 	def __call__(self, request):
 		try:
 			# logging.info(request.META)
-			print("request_meta==",request.META)
+			# print("request_meta==",request.META)
 			# if request.META["REQUEST_URI"].strip("/").split("/")[-1] not in ["loginapi"
 			# 			,"register-user"
 			# 			,"reset-password","logout"
