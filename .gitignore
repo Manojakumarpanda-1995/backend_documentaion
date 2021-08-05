@@ -1,0 +1,5 @@
+backend/logs/*
+*.pyc
+mmtxt/*
+backend/db.sqlite3
+backend/Logs/*
