@@ -6,7 +6,7 @@ from rest_framework import schemas
 
 from rest_framework.schemas import openapi
 
-class Get_Company_Schema(object):
+class List_Users_Schema(object):
     
     def get_manual_fields(self):
         manual_fields=[
@@ -22,9 +22,9 @@ class Get_Company_Schema(object):
                           ,required=True
                           ,location=""
                           ,schema=coreschema.Object()
-                          ,description="Company Id"
+                          ,description="Company id for which role creating"
                           ,type="integer"
-            )
-            
+                ),
+           
         ]
         return manual_fields

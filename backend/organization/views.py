@@ -7,12 +7,17 @@ from rest_framework.views import APIView
 
 ##Importing mixins
 from organization.mixins.create_company_mixin import Create_Company_Schema
+from organization.mixins.create_usercompany_role_mixin import \
+    Create_Usercompany_Role_Schema
+from organization.mixins.deactivate_usercompany_role_mixin import \
+    Deactivate_Usercompany_Role_Schema
 from organization.mixins.delete_company_mixin import Delete_Company_Schema
 from organization.mixins.edit_company_mixin import Edit_Company_Schema
 from organization.mixins.get_company_mixin import Get_Company_Schema
 from organization.mixins.list_company_mixin import List_Company_Schema
 from organization.mixins.list_company_byemail_mixin import \
     List_Company_Byemail_Schema
+from organization.mixins.list_users_mixin import List_Users_Schema
 ## Roles
 from organization.utils.create_company import func_create_company
 from organization.utils.create_usercompanyrole import \
@@ -143,7 +148,11 @@ class delete_company(APIView,Delete_Company_Schema):
 		response = func_delete_company(request_data,token)
 		return Response(response)
 
-class create_usercompanyrole(APIView):
+class create_usercompanyrole(APIView,Create_Usercompany_Role_Schema):
+	permission_classes=(AllowAny,)
+	allowed_methods=("POST",)
+	schema=AutoSchema(manual_fields=Create_Usercompany_Role_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -158,7 +167,11 @@ class create_usercompanyrole(APIView):
 		response = func_create_usercompanyrole(request_data,token)
 		return Response(response)
 
-class deactivate_usercompanyrole(APIView):
+class deactivate_usercompanyrole(APIView,Deactivate_Usercompany_Role_Schema):
+	permission_classes=(AllowAny,)
+	allowed_methods=("POST",)
+	schema=AutoSchema(manual_fields=Deactivate_Usercompany_Role_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -173,7 +186,11 @@ class deactivate_usercompanyrole(APIView):
 		response = func_deactivate_usercompanyrole(request_data,token)
 		return Response(response)
 		
-class list_users(APIView):
+class list_users(APIView,List_Users_Schema):
+	permission_classes=(AllowAny,)
+	allowed_methods=("POST",)
+	schema=AutoSchema(manual_fields=List_Users_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
