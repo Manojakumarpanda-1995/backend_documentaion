@@ -1,5 +1,4 @@
-from backend.project.mixins.list_project_byemail_mixin import List_Projects_Byemail_Schema
-from backend.project.mixins.list_project_mixin import List_Projects_Schema
+
 import mimetypes
 import os
 from wsgiref.util import FileWrapper
@@ -16,13 +15,18 @@ from rest_framework.schemas import AutoSchema
 
 #mixins
 from project.mixins.assign_project_mixin import Assign_Project_Schema
+from project.mixins.bulk_upload_fies_mixin import Bulk_Upload_Users_Schema
 from project.mixins.create_project_mixin import Create_Project_Schema
 from project.mixins.create_project_user_mixin import \
     Create_Project_User_Schema 
 from project.mixins.delete_project_mixin import Delete_Project_Schema
+from project.mixins.download_file_mixin import Download_File_Schema
+from project.mixins.bulk_download_user_mixin import \
+    Bulk_Download_Users_Schema
 from project.mixins.edit_project_mixin import Edit_Project_Schema
 from project.mixins.edit_project_user_mixin import \
     Edit_Project_User_Schema
+from project.mixins.generate_logs_mixin import Generate_Logs_Schema
 from project.mixins.list_project_mixin import List_Projects_Schema
 from project.mixins.list_project_byemail_mixin import \
     List_Projects_Byemail_Schema
@@ -233,8 +237,7 @@ class list_users_by_project(APIView,List_Users_by_Project_Schema):
 		response = func_list_users_by_project(request_data,token)
 		return Response(response)		
 
-class list_project_for_users(APIView,List_Project_For_Users_Schema):
-    
+class list_project_for_users(APIView,List_Project_For_Users_Schema):  
 	allowed_methods=("POST",)
 	permission_classes=(AllowAny,)
 	schema=AutoSchema(manual_fields=List_Project_For_Users_Schema().get_manual_fields())
@@ -253,26 +256,12 @@ class list_project_for_users(APIView,List_Project_For_Users_Schema):
 		response = func_list_project_for_users(request_data,token)
 		return Response(response)
 
-### Get Progress ###############
-# Rohit - Done
-class get_progress(APIView): 
-	def post(self, request):
-		request_data = request.data
-		newInfo = {
-			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
-			# #"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
-			"Requested_URL": request.META["PATH_INFO"],
-			"Remote_ADDR": request.META["REMOTE_ADDR"]
-		}
-		request_data = {**request_data, **newInfo}
-		token = request.META["HTTP_AUTHORIZATION"]
-		response = func_get_progress(request_data,token)
-		return Response(response)
-
 ### Upload File ##############
 # Rohit - Done
-class bulk_upload_users(APIView):
+class bulk_upload_users(APIView,Bulk_Upload_Users_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Bulk_Upload_Users_Schema().get_manual_fields())
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -289,7 +278,11 @@ class bulk_upload_users(APIView):
 
 ### Download File ##############
 # Rohit - Done
-class bulk_download_users(APIView):
+class bulk_download_users(APIView,Bulk_Download_Users_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Bulk_Download_Users_Schema().get_manual_fields())
+	
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -305,7 +298,28 @@ class bulk_download_users(APIView):
 		return Response(response)
 
 # Rohit - Done
-class download_file(APIView):
+class download_file(APIView,Download_File_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Download_File_Schema().get_manual_fields())
+ 
+	def post(self, request):
+		request_data = request.data
+		newInfo = {
+			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
+			# #"Requested_URL": request.META["REQUEST_URI"],
+				"Requested_URL": request.META["PATH_INFO"],
+			"Requested_URL": request.META["PATH_INFO"],
+			"Remote_ADDR": request.META["REMOTE_ADDR"]
+		}
+		request_data = {**request_data, **newInfo}
+		token = request.META["HTTP_AUTHORIZATION"]
+		response = func_download_file(request_data,token)
+		return Response(response)
+
+### Get Progress ###############
+# Rohit - Done
+class get_progress(APIView): 
 	def get(self, request):
 		request_data = request.data
 		newInfo = {
@@ -318,8 +332,8 @@ class download_file(APIView):
 		request_data = {**request_data, **newInfo}
 		request_data["download_token"] = request.query_params["download_token"]
 		token = request.META["HTTP_AUTHORIZATION"]
-		response = func_download_file(request_data,token)
 		# response = FileResponse(open(response["file_path"], "rb"))
+		response = func_get_progress(request_data,token)
 		return FileResponse(open(response["file_path"], "rb"))
 
 # Rohit - Done
@@ -349,7 +363,10 @@ class download_large_file(APIView):
 
 ### Logs ##############
 # Rohit - Done
-class generate_user_logs(APIView):
+class generate_user_logs(APIView,Generate_Logs_Schema):
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Generate_Logs_Schema().get_manual_fields())
+    
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
