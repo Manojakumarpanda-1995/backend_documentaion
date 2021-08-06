@@ -20,6 +20,9 @@ class Company(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	updated_by = models.ForeignKey(Users, blank=False, null=False, on_delete=models.CASCADE, related_name="company_updated_by")
 
+	class Meta:
+		db_table="Company"
+ 
 class UserCompanyRole(models.Model):
 	id = models.AutoField(primary_key=True)
 	user = models.ForeignKey(Users, blank=False, null=False, on_delete=models.CASCADE)
@@ -30,3 +33,8 @@ class UserCompanyRole(models.Model):
 	created_by = models.ForeignKey(Users, blank=False, null=False, on_delete=models.CASCADE, related_name="user_role_created_by")
 	updated_at = models.DateTimeField(auto_now=True)
 	updated_by = models.ForeignKey(Users, blank=False, null=False, on_delete=models.CASCADE, related_name="user_role_updated_by")
+ 
+	class Meta:
+		db_table="UserCompanyRole"
+		
+ 

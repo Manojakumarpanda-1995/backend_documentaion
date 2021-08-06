@@ -14,7 +14,8 @@ class SetNew_Password_Schema(object):
 							,location="headers"
 							,schema=coreschema.Object()
                             ,description="Email of user."
-                            ,type="string"),
+                            ,type="string"
+                            ,example="1a02762cd8ae414590ec37f49b66cbf7"),
             coreapi.Field(name='email'
                             ,required=True
 							,location=""

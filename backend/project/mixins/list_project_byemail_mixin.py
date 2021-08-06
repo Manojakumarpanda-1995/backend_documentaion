@@ -1,12 +1,11 @@
-from os import name
-import string
 import coreapi
 import coreschema
+import string
 from rest_framework import schemas
 
 from rest_framework.schemas import openapi
 
-class List_Company_Byemail_Schema(object):
+class List_Projects_Byemail_Schema(object):
     
     def get_manual_fields(self):
         manual_fields=[
@@ -14,24 +13,24 @@ class List_Company_Byemail_Schema(object):
                           ,required=True
                           ,location="header"
                           ,schema=coreschema.Object()
-                          ,description="Authorization Token of user"
+                          ,description="Authorization Token of User"
                           ,type="string"
-                          ,example="066f3ccce4f344cbad9716b6f8ba9f8a"
+                          ,example="1a02762cd8ae414590ec37f49b66cbf7"
+                          ),
+            coreapi.Field(name="client_id"
+                          ,required=True
+                          ,location=""
+                          ,schema=coreschema.Object()
+                          ,description="Company Id."
+                          ,type="integer"
                           ),
             coreapi.Field(name="email"
                           ,required=True
                           ,location=""
                           ,schema=coreschema.Object()
-                          ,description="Email Id of User"
+                          ,description="Email of user whose project to list down."
                           ,type="string"
-                ),
-            coreapi.Field(name="company_id"
-                          ,required=False
-                          ,location=""
-                          ,schema=coreschema.Object()
-                          ,description="Company Id"
-                          ,type="integer"
-                )
-            
+                          )
         ]
+        
         return manual_fields

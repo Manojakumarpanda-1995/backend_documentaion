@@ -14,7 +14,8 @@ class List_User_Byemail_Schema(object):
 							,location="headers"
 							,schema=coreschema.Object()
                             ,description="User's Authorization token."
-                            ,type="string"),
+                            ,type="string"
+                            ,example="1a02762cd8ae414590ec37f49b66cbf7"),
             coreapi.Field(name="email" 
                             ,required=True
                             ,location=""

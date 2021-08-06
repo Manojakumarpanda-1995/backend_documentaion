@@ -1,40 +1,65 @@
-import os
+from backend.project.mixins.list_project_byemail_mixin import List_Projects_Byemail_Schema
+from backend.project.mixins.list_project_mixin import List_Projects_Schema
 import mimetypes
+import os
+from wsgiref.util import FileWrapper
+
 import requests
+from django.http import FileResponse, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from django.http import FileResponse, StreamingHttpResponse, HttpResponse
-from wsgiref.util import FileWrapper
-from rest_framework.views import APIView
+from rest_framework import schemas
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.schemas import AutoSchema
 
-## Projects
-from project.utils.create_project import func_create_project
+#mixins
+from project.mixins.assign_project_mixin import Assign_Project_Schema
+from project.mixins.create_project_mixin import Create_Project_Schema
+from project.mixins.create_project_user_mixin import \
+    Create_Project_User_Schema 
+from project.mixins.delete_project_mixin import Delete_Project_Schema
+from project.mixins.edit_project_mixin import Edit_Project_Schema
+from project.mixins.edit_project_user_mixin import \
+    Edit_Project_User_Schema
+from project.mixins.list_project_mixin import List_Projects_Schema
+from project.mixins.list_project_byemail_mixin import \
+    List_Projects_Byemail_Schema
+from project.mixins.list_project_for_users_mixin import \
+    List_Project_For_Users_Schema
+from project.mixins.list_users_by_project_mixin import \
+    List_Users_by_Project_Schema
+## Download File
 from project.utils.assign_project import func_assign_project
-from project.utils.list_projects import func_list_projects
-from project.utils.list_projects_byemail import func_list_projects_byemail
-from project.utils.edit_project import func_edit_project
-from project.utils.delete_project import func_deactivate_project
-from project.utils.edit_project_user_id import func_edit_project_user_id
-from project.utils.create_project_user import func_create_project_user
-from project.utils.list_users_by_project import func_list_users_by_project
-from project.utils.list_project_for_users import func_list_project_for_users
-## Get Progress
-from project.utils.get_progress import func_get_progress
-
+from project.utils.bulk_download_users import func_bulk_user_download
 ## Upload File
 from project.utils.bulk_upload_users import func_bulk_user_upload
-## Download File
-from project.utils.bulk_download_users import func_bulk_user_download
+## Projects
+from project.utils.create_project import func_create_project
+from project.utils.create_project_user import func_create_project_user
+from project.utils.delete_project import func_deactivate_project
 from project.utils.download_file import func_download_file
+from project.utils.edit_project import func_edit_project
+from project.utils.edit_project_user_id import func_edit_project_user_id
 ## Logs
 from project.utils.generate_user_logs import func_generate_user_logs
+## Get Progress
+from project.utils.get_progress import func_get_progress
+from project.utils.list_project_for_users import func_list_project_for_users
+from project.utils.list_projects import func_list_projects
+from project.utils.list_projects_byemail import func_list_projects_byemail
+from project.utils.list_users_by_project import func_list_users_by_project
 
 
 # Create your views here.
 ### Project ##########
 # Rohit - Done
-class create_project(APIView):
+class create_project(APIView,Create_Project_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Create_Project_Schema().get_manual_fields())
+    
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -50,7 +75,11 @@ class create_project(APIView):
 		return Response(response)
 
 # Rohit - Done
-class assign_project(APIView):
+class assign_project(APIView,Assign_Project_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Assign_Project_Schema().get_manual_fields())
+	
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -66,7 +95,11 @@ class assign_project(APIView):
 		return Response(response)
 
 # Rohit - Done
-class list_project(APIView):
+class list_project(APIView,List_Projects_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=List_Projects_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -82,7 +115,11 @@ class list_project(APIView):
 		return Response(response)
 
 # Rohit - Done
-class list_projects_byemail(APIView):
+class list_projects_byemail(APIView,List_Projects_Byemail_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=List_Projects_Byemail_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -98,7 +135,11 @@ class list_projects_byemail(APIView):
 		return Response(response)
 
 # Rohit - Done
-class edit_project(APIView):
+class edit_project(APIView,Edit_Project_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Edit_Project_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -114,7 +155,11 @@ class edit_project(APIView):
 		return Response(response)
 
 # Rohit - Done
-class delete_project(APIView):
+class delete_project(APIView,Delete_Project_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Delete_Project_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -130,23 +175,11 @@ class delete_project(APIView):
 		return Response(response)
 
 # Rohit - Done
-class edit_project_user_id(APIView):
-	def post(self, request):
-		request_data = request.data
-		newInfo = {
-			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
-			# #"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
-			"Requested_URL": request.META["PATH_INFO"],
-			"Remote_ADDR": request.META["REMOTE_ADDR"]
-		}
-		request_data = {**request_data, **newInfo}
-		token = request.META["HTTP_AUTHORIZATION"]
-		response = func_edit_project_user_id(request_data,token)
-		return Response(response)
-
-# Rohit - Done
-class create_project_user(APIView):
+class create_project_user(APIView,Create_Project_User_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Create_Project_User_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -160,9 +193,32 @@ class create_project_user(APIView):
 		token = request.META["HTTP_AUTHORIZATION"]
 		response = func_create_project_user(request_data,token)
 		return Response(response)
-		
-		
-class list_users_by_project(APIView):
+
+# Rohit - Done
+class edit_project_user_id(APIView,Edit_Project_User_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=Edit_Project_User_Schema().get_manual_fields())
+ 
+	def post(self, request):
+		request_data = request.data
+		newInfo = {
+			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
+			# #"Requested_URL": request.META["REQUEST_URI"],
+				"Requested_URL": request.META["PATH_INFO"],
+			"Requested_URL": request.META["PATH_INFO"],
+			"Remote_ADDR": request.META["REMOTE_ADDR"]
+		}
+		request_data = {**request_data, **newInfo}
+		token = request.META["HTTP_AUTHORIZATION"]
+		response = func_edit_project_user_id(request_data,token)
+		return Response(response)
+				
+class list_users_by_project(APIView,List_Users_by_Project_Schema):
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=List_Users_by_Project_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -177,7 +233,12 @@ class list_users_by_project(APIView):
 		response = func_list_users_by_project(request_data,token)
 		return Response(response)		
 
-class list_project_for_users(APIView):
+class list_project_for_users(APIView,List_Project_For_Users_Schema):
+    
+	allowed_methods=("POST",)
+	permission_classes=(AllowAny,)
+	schema=AutoSchema(manual_fields=List_Project_For_Users_Schema().get_manual_fields())
+ 
 	def post(self, request):
 		request_data = request.data
 		newInfo = {
@@ -208,7 +269,6 @@ class get_progress(APIView):
 		token = request.META["HTTP_AUTHORIZATION"]
 		response = func_get_progress(request_data,token)
 		return Response(response)
-
 
 ### Upload File ##############
 # Rohit - Done

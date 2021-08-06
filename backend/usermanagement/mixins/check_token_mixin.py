@@ -20,7 +20,9 @@ class Check_Schema(object):
                             ,location="header"
 							,schema=coreschema.Object()
                             ,description="Authorization Token of user"
-                            ,type="string")
+                            ,type="string"
+                            ,example="1a02762cd8ae414590ec37f49b66cbf7"
+                            )
             ]
         
         return manual_fields 

@@ -9,7 +9,6 @@ def get_file_path(instance, filename):
 	s = instance.created_by.hashkey
 	return os.path.join(str(s), filename)
 
-
 class ProjectInfo(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=1000, blank=False, null=False)
@@ -22,6 +21,8 @@ class ProjectInfo(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	updated_by = models.ForeignKey(Users, blank=False, null=False, on_delete=models.CASCADE, related_name="project_updated_by")
 
+	class Meta:
+		db_table="ProjectInfo"
 
 class ProjectUsers(models.Model):
 	user = models.ForeignKey(UserCompanyRole, blank=False, null=False, on_delete=models.CASCADE)
@@ -33,6 +34,8 @@ class ProjectUsers(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	updated_by = models.ForeignKey(Users, blank=False, null=False, on_delete=models.CASCADE, related_name="project_user_updated_by")
 
+	class Meta:
+		db_table="Project Users"
 
 class FileUpload(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -45,6 +48,8 @@ class FileUpload(models.Model):
 	def __str__(self):
 		return self.original_file_name
 
+	class Meta:
+		db_table="Files Uploaded"
 
 class ActivityLogs(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -53,6 +58,8 @@ class ActivityLogs(models.Model):
 	activity = models.TextField(blank=False, null=False)
 	ip_address = models.CharField(max_length=200, blank=True, null=True)
 
+	class Meta:
+		db_table="Project ActivityLogs"
 
 class DownloadFile(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -60,10 +67,18 @@ class DownloadFile(models.Model):
 	datafile = models.FileField(blank=False, null=False)
 	unique_string = models.TextField(blank=False, null=False)
 
+	class Meta:
+		db_table="Download Files"
+
 class GetProgress(models.Model):
 	id = models.AutoField(primary_key=True)
 	user = models.ForeignKey(Users, blank=False, null=False, on_delete=models.CASCADE)
 	bulk_user_upload = models.TextField(default={})
 	bulk_user_download = models.TextField(default={})
 	base_file_upload = models.TextField(default={})
-	get_user_logs = models.TextField(default={})	
+	get_user_logs = models.TextField(default={})
+ 
+
+	class Meta:
+		db_table="GetProgress"
+

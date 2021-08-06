@@ -41,7 +41,7 @@ def func_delete_company(request_data, token):
 			# Get UserCompanyRole
 			getUserCompanyRole = UserCompanyRole.objects.filter(user=curr_user, 
 																user__active=True,
-																company__id=request_data["company_id"],
+																# company__id=request_data["company_id"],
 																company__active=True, 
 																role__active=True, 
 																isActive=True)
@@ -77,7 +77,7 @@ def func_delete_company(request_data, token):
 				response["statuscode"] = 200
 			
 			else:
-				logs["data"]["data_fields"] = [changed_values]
+				logs["data"]["data_fields"] = [apiParamsInfo["client_id"]]
 				logs["data"]["status_message"] = "Company with provided ID doesn't exist."
 
 				response['message'] = "Company with provided ID doesn't exist."

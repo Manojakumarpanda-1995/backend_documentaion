@@ -117,8 +117,6 @@ def func_edit_project(request_data, token):
 							response["statuscode"] = 400
 							return response
 
-				
-
 				for key, value in apiParamsInfo.items():
 					if key in [f.name for f in getProject._meta.get_fields()]:
 						if key != "logo":
