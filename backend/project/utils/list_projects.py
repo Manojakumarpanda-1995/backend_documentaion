@@ -45,7 +45,7 @@ def func_list_projects(request_data, token):
 			# Get UserCompanyRole
 			getUserCompanyRole = UserCompanyRole.objects.filter(user=curr_user, 
 																user__active=True,
-																company__id=request_data["company_id"],
+																#company__id=request_data["company_id"]
 																company__active=True, 
 																role__active=True, 
 																isActive=True)
@@ -73,6 +73,15 @@ def func_list_projects(request_data, token):
 						"role": project.user.role.role_name,
 						"name": project.project.name,
 						"project_id": project.project.project_id,
+						"description ":project.project.description,
+						"catagory ":project.project.catagory,
+						"salary_from":project.project.salary_from,
+						"salary_to":project.project.salary_to,
+						"start_date":project.project.start_date,
+						"end_date":project.project.end_date,
+						"start_time":project.project.start_time,
+						"end_time":project.project.end_time,
+						"publish":project.project.publish,
 						"status": project.project.isActive,
 						"created_at": project.project.created_at,
 						"isEditable": isEditable
@@ -111,10 +120,19 @@ def func_list_projects(request_data, token):
 						"user_email": project.user.user.email,
 						"company_name": project.user.company.name,
 						"role": project.user.role.role_name,
-						"created_at": project.project.created_at,
 						"name": project.project.name,
 						"project_id": project.project.project_id,
+						"description ":project.project.description,
+						"catagory ":project.project.catagory,
+						"salary_from":project.project.salary_from,
+						"salary_to":project.project.salary_to,
+						"start_date":project.project.start_date,
+						"end_date":project.project.end_date,
+						"start_time":project.project.start_time,
+						"end_time":project.project.end_time,
+						"publish":project.project.publish,
 						"status": project.project.isActive,
+						"created_at": project.project.created_at,
 						"isEditable": isEditable
 					})
 		elif "PROJECT-ADMIN" in allRoles:
@@ -140,8 +158,17 @@ def func_list_projects(request_data, token):
 						"role": project.user.role.role_name,
 						"name": project.project.name,
 						"project_id": project.project.project_id,
-						"created_at": project.project.created_at,
+						"description ":project.project.description,
+						"catagory ":project.project.catagory,
+						"salary_from":project.project.salary_from,
+						"salary_to":project.project.salary_to,
+						"start_date":project.project.start_date,
+						"end_date":project.project.end_date,
+						"start_time":project.project.start_time,
+						"end_time":project.project.end_time,
+						"publish":project.project.publish,
 						"status": project.project.isActive,
+						"created_at": project.project.created_at,
 						"isEditable": isEditable
 					})
 		elif "USER" in allRoles:
@@ -164,8 +191,17 @@ def func_list_projects(request_data, token):
 						"role": project.user.role.role_name,
 						"name": project.project.name,
 						"project_id": project.project.project_id,
-						"created_at": project.project.created_at,
+						"description ":project.project.description,
+						"catagory ":project.project.catagory,
+						"salary_from":project.project.salary_from,
+						"salary_to":project.project.salary_to,
+						"start_date":project.project.start_date,
+						"end_date":project.project.end_date,
+						"start_time":project.project.start_time,
+						"end_time":project.project.end_time,
+						"publish":project.project.publish,
 						"status": project.project.isActive,
+						"created_at": project.project.created_at,
 						"isEditable": isEditable
 					})
 		else:

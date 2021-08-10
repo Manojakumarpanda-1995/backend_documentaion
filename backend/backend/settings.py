@@ -168,7 +168,7 @@ REST_FRAMEWORK={ 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSch
 # from rest_framework.parsers.
 SWAGGER_SETTINGS = {
     # For using django admin panel for authentication
-    'USE_SESSION_AUTH': True,
+    'USE_SESSION_AUTH': False,
     'LOGIN_URL': 'usermanagement:loginapi',
     'JSON_EDITOR': True,
     "SHOW_REQUEST_HEADERS":True,

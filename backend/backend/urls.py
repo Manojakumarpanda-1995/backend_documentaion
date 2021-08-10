@@ -13,11 +13,6 @@ from rest_framework.schemas import get_schema_view
 from rest_framework.documentation import include_docs_urls
 from usermanagement import views
 
-# schema_view=get_schema_view(
-#     title="backend Api Documents",
-#     description="Api documentation for all apis",
-#     version='1.0.0',)
-
 schema_view = get_swagger_view(title='backend API')
 
 # schema_view=get_schema_view(
@@ -27,11 +22,11 @@ schema_view = get_swagger_view(title='backend API')
 
 
 urlpatterns = [
-   path('', schema_view,name='api_documentation'),
-    path('docs/',include_docs_urls(title='api_documentation')),
+    path('doc', schema_view,name='api_documentation'),
+    # path('docs/',include_docs_urls(title='api_documentation')),
     # path('loginapi', views.login.as_view(),name="loginapi"),
     # url(r'^$', RedirectView.as_view(url='login')),
-    url(r'^login$', TemplateView.as_view(template_name='login.html')),
+    # url(r'^login$', TemplateView.as_view(template_name='login.html')),
     path("access/",include("usermanagement.urls"),name="usermanagement"),
     path("org/",include("organization.urls"),name="organization"),
     path("project/",include("project.urls"),name="project"),

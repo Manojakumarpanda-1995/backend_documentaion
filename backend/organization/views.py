@@ -44,8 +44,8 @@ class list_company(APIView,List_Company_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -63,8 +63,8 @@ class list_company_byemail(APIView,List_Company_Byemail_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -82,8 +82,8 @@ class create_company(APIView,Create_Company_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -101,8 +101,8 @@ class get_company(APIView,Get_Company_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -120,8 +120,8 @@ class edit_company(APIView,Edit_Company_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -139,8 +139,8 @@ class delete_company(APIView,Delete_Company_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -158,8 +158,8 @@ class create_usercompanyrole(APIView,Create_Usercompany_Role_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -177,8 +177,8 @@ class deactivate_usercompanyrole(APIView,Deactivate_Usercompany_Role_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
@@ -196,8 +196,8 @@ class list_users(APIView,List_Users_Schema):
 		newInfo = {
 			"Client_IP_Address": 'localhost' if 'HTTP_X_FORWARDED_FOR' not in request.META else request.META['HTTP_X_FORWARDED_FOR'],
 			
-			#"Requested_URL": request.META["REQUEST_URI"],
-				"Requested_URL": request.META["PATH_INFO"],
+			 "Requested_URL": request.META["REQUEST_URI"],
+			 
 			"Remote_ADDR": request.META["REMOTE_ADDR"]
 		}
 		request_data = {**request_data, **newInfo}
