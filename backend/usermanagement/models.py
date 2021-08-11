@@ -81,6 +81,7 @@ class Workers(models.Model):
 	name		=models.CharField(max_length=200,blank=False,null=False,db_column="Name of Worker")
 	email		=models.CharField(max_length=250,blank=False,null=False,db_column="Email")
 	phone_no	=models.CharField(max_length=13,blank=True,null=True,db_column="Ph.No")
+	skill_sets		=models.TextField(blank=True,null=True,db_column="Skill Sets")
 	active		=models.BooleanField(default=True)
 	created_at 	= models.DateTimeField(auto_now_add=True)
 	updated_at 	= models.DateTimeField(auto_now=True)

@@ -27,8 +27,8 @@ class Login_Schema(object):
 	#   manual_fields=[coreapi.Field(#"email"
     #                         name='email'
     #                         ,required=True
-    #                         ,location="formdata"#/'query/path/body/location/headers'
-    #                           """headers->to pass the headers parameters in request"""
+    #                         ,location="formdata"#/'query/path/body/location/header'
+    #                           """header->to pass the headers parameters in request"""
     #                         ,description="Email of user"
     #                         ,type=string),
     #         coreapi.Field(name="password"

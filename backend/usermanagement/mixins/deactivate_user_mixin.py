@@ -11,7 +11,7 @@ class Deactivate_User_Schema(object):
         manual_fields=[
             coreapi.Field(name='Authorization'
                             ,required=True
-							,location="headers"
+							,location="header"
 							,schema=coreschema.Object()
                             ,description="User's Authorization token."
                             ,type="string"
@@ -22,6 +22,12 @@ class Deactivate_User_Schema(object):
 							,schema=coreschema.Object()
                             ,description="User's ID which will delete."
                             ,type="integer"),
+            coreapi.Field(name="status"
+                            ,required=True
+                            ,location=""
+							,schema=coreschema.Object()
+                            ,description="Status of the user."
+                            ,type="boolean"),
             
             
             ]

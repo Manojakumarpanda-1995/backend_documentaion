@@ -11,7 +11,7 @@ class Create_Role_Schema(object):
         manual_fields=[
             coreapi.Field(name='Authorization'
                             ,required=True
-							,location="headers"
+							,location="header"
 							,schema=coreschema.Object()
                             ,description="User's Authorization token."
                             ,type="string"

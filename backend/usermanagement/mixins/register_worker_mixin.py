@@ -21,6 +21,12 @@ class Register_Worker_Schema(object):
 							,schema=coreschema.Object()
                             ,description="Email of user"
                             ,type="string"),
+            coreapi.Field(name='skill_sets'
+                            ,required=True
+							,location=""
+							,schema=coreschema.Object()
+                            ,description="Skills user have"
+                            ,type="string"),
             coreapi.Field(name="phone_no"
                             ,required=True
                             ,location=""

@@ -18,7 +18,7 @@ class List_Users_Schema(object):
                           ,type="string"
                           ,example="066f3ccce4f344cbad9716b6f8ba9f8a"
                           ),
-            coreapi.Field(name="client_id"
+            coreapi.Field(name="company_id"
                           ,required=True
                           ,location=""
                           ,schema=coreschema.Object()
