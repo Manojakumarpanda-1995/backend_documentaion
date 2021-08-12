@@ -9,19 +9,18 @@ class Login_Schema(object):
     def get_manual_fields(self):
         
         manual_fields=[
-            coreapi.Field(
-                            name='email'
-                            ,required=True
-							,location=""
-							,schema=coreschema.Object()
-                            ,description="Email of user"
-                            ,type="string"),
+            coreapi.Field(name='email'
+                        ,required=True
+						,location=""
+						,schema=coreschema.Object()
+                        ,description="Email of user"
+                        ,type="string"),
             coreapi.Field(name="password"
-                            ,required=True
-                            ,location=""
-							,schema=coreschema.Object()
-                            ,description="Password of user"
-                            ,type="string")
+                        ,required=True
+                        ,location=""
+						,schema=coreschema.Object()
+                        ,description="Password of user"
+                        ,type="string")
             ]
         # print("manual_fields=",Login_Schema().get_manual_fields())
 	#   manual_fields=[coreapi.Field(#"email"

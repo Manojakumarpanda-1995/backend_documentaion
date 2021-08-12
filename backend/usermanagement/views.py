@@ -53,7 +53,7 @@ from .serializer import *
 
 
 class login(APIView,Login_Schema):
-	# serializer_class =UserSerializer#,many=True)
+	serializer_class =UserSerializer#,many=True)
 	permission_classes = (AllowAny,)
 	allowed_methods = ('POST',)
 	schema=AutoSchema(manual_fields=Login_Schema().get_manual_fields())
@@ -67,6 +67,7 @@ class login(APIView,Login_Schema):
 				"Remote_ADDR": request.META["REMOTE_ADDR"]
 			}
 		request_data = {**request_data, **newInfo}
+		print("request_data==>",request.data)
 		response = func_login(request_data)
 		return Response(response)
 

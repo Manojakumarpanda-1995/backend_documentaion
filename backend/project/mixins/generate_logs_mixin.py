@@ -31,7 +31,7 @@ class Generate_Logs_Schema(object):
                           ,location=""
                           ,schema=coreschema.Object()
                           ,description="Logs from"
-                          ,type="datetime"
+                          ,type="dateTime"
                           
                           ),
             
@@ -40,7 +40,7 @@ class Generate_Logs_Schema(object):
                           ,location=""
                           ,schema=coreschema.Object()
                           ,description="Logs to"
-                          ,type="datetime"
+                          ,type="dateTime"
                          
                           ),
         ]

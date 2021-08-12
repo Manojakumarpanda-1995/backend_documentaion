@@ -64,14 +64,14 @@ class Create_Project_Schema(object):
                           ,location=""
                           ,schema=coreschema.Object()
                           ,description="Starting date of job."
-                          ,type="string"
+                          ,type="dateTime"
                           ),
             coreapi.Field(name="end_date"
                           ,required=True
                           ,location=""
                           ,schema=coreschema.Object()
                           ,description="Ending date of job."
-                          ,type="string"
+                          ,type="date"
                           ),
             coreapi.Field(name="start_time"
                           ,required=True
