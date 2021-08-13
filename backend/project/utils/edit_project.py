@@ -19,6 +19,7 @@ media_files = getattr(settings, "MEDIA_ROOT", None)
 static_files = getattr(settings, "STATIC_ROOT", None)
 actvity_logs = getattr(settings, "ACTIVITY_LOGS_DB", None)
 error_logs = getattr(settings, "ERROR_LOGS_DB", None)
+from django.utils.dateparse import parse_date, parse_time
 
 
 def storeLogoToStatic(file_name, old_file):
@@ -71,7 +72,7 @@ def func_edit_project(request_data, token):
 			# Get UserCompanyRole
 			getUserCompanyRole = UserCompanyRole.objects.filter(user=curr_user, 
 																user__active=True,
-																# company__id=request_data["company_id"],
+																#company__id=request_data["company_id"]
 																company__active=True, 
 																role__active=True, 
 																isActive=True)
@@ -90,7 +91,8 @@ def func_edit_project(request_data, token):
 		
 		apiParamsInfo = {}
 		for key, value in request_data.items():
-			if key not in ["Client_IP_Address", "Remote_ADDR", "Requested_URL", "company_id"]:
+			if key not in ["Client_IP_Address","Remote_ADDR","Requested_URL","company_id",
+                  				"start_date","end_date","start_time","end_time"]:
 				apiParamsInfo[key] = value
 
 		changed_values = []
@@ -117,9 +119,25 @@ def func_edit_project(request_data, token):
 							response["statuscode"] = 400
 							return response
 
+				# start_date=request_data['start_date'].split("-")				
+				# end_date=request_data['end_date'].split("-")				
+				# apiParamsInfo["start_date"]=datetime.date(year=int(start_date[0])
+				# 											,month=int(start_date[1])
+				# 											,day=int(start_date[2]))				
+				# apiParamsInfo["end_date"]=datetime.date(year=int(start_date[0])
+				# 											,month=int(start_date[1])
+				# 											,day=int(start_date[2]))
+				# start_time=request_data["start_time"].split(":")
+				# end_time=request_data["end_time"].split(":")
+				# apiParamsInfo["start_time"]=datetime.time(hour=int(start_time[0]),minute=int(start_time[1]))				
+				# apiParamsInfo["end_time"]=datetime.time(hour=int(end_time[0]),minute=int(end_time[1]))
+				apiParamsInfo["start_date"]=parse_date(request_data["start_date"])
+				apiParamsInfo["end_date"]=parse_date(request_data["end_date"])
+				apiParamsInfo["start_time"]=parse_time(request_data["start_time"])
+				apiParamsInfo["end_time"]=parse_time(request_data["end_time"])
 				for key, value in apiParamsInfo.items():
 					if key in [f.name for f in getProject._meta.get_fields()]:
-						if key != "logo":
+						if key != "logo" or key not in ["start_date","end_date","start_time","end_time"]:
 							changed_values.append((getattr(getProject, key), apiParamsInfo[key]))
 						setattr(getProject, key, apiParamsInfo[key])
 
@@ -132,7 +150,7 @@ def func_edit_project(request_data, token):
 						getProject.logo.name = newfile_name
 						getProject.save()
 
-				logs["data"]["data_fields"] = [apiParamsInfo["project"], changed_values]
+				logs["data"]["data_fields"] = [apiParamsInfo["project"]]#, changed_values]
 				logs["data"]["status_message"] = "Project data updated successfully."
 
 				response['message'] = "Project data updated successfully."

@@ -10,7 +10,6 @@ def get_file_path(instance, filename):
 	s = instance.created_by.hashkey
 	return os.path.join(str(s), filename)
 
-
 class ProjectInfo(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=1000, blank=False, null=False)
