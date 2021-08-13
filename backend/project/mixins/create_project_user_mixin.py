@@ -51,7 +51,7 @@ class Create_Project_User_Schema(object):
                           ,location=""
                           ,schema=coreschema.Object()
                           ,description="Is this new user."
-                          ,type="bollean"
+                          ,type="boolean"
                           ),
             coreapi.Field(name="first_name"
                           ,required=True

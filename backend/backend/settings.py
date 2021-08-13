@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'organization',
     'project',
     "rest_framework_swagger",
-    "drf_yasg"
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -261,8 +261,8 @@ import urllib.parse
 username = urllib.parse.quote_plus('backend')
 password = urllib.parse.quote_plus('sd@f@sjdkfe323tfd@')
 # client = MongoClient('mongodb://%s:%s@backend_mongodb/' % (username, password))
-client = MongoClient('mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb')
-
+# client = MongoClient('mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb')
+client = MongoClient('mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb')
 # mongo_uri = "mongodb://backend:" + urllib.quote("sd@f@sjdkfe323tfd@") + "@backend_mongodb/"
 # client = MongoClient("mongodb://backend:sd@f@sjdkfe323tfd@@backend_mongodb")
 # client = MongoClient(mongo_uri)

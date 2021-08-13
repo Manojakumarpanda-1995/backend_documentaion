@@ -41,7 +41,7 @@ def func_list_company(request_data, token):
 			# Get UserCompanyRole
 			getUserCompanyRole = UserCompanyRole.objects.filter(user=curr_user, 
 																user__active=True,
-																company__id=request_data["company_id"],
+																#company__id=request_data["company_id"],
 																company__active=True, 
 																role__active=True, 
 																isActive=True)
