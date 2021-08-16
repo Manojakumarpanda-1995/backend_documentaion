@@ -23,6 +23,8 @@ urlpatterns = [
     path('list-company', views.list_company.as_view()),#ok
     path('list-company-byemail', views.list_company_byemail.as_view()),#ok
     path('edit-company', views.edit_company.as_view()),#ok
+    path('get-company-info', views.get_company_info.as_view()),#ok
+    path('edit-company-info', views.edit_company_info.as_view()),#ok
     # path('fetch-company-details', views.fetch_company_details.as_view()),
     # path('company-details', views.company_details.as_view()), ################ make
     ## Projects
