@@ -256,10 +256,10 @@ STORAGE_THRESHOLD = 50 #MB
 TEMPLATE_DIR=os.path.join(BASE_DIR,'templates')
 
 from pymongo import MongoClient
-import urllib.parse
+# import urllib.parse
 
-username = urllib.parse.quote_plus('backend')
-password = urllib.parse.quote_plus('sd@f@sjdkfe323tfd@')
+# username = urllib.parse.quote_plus('backend')
+# password = urllib.parse.quote_plus('sd@f@sjdkfe323tfd@')
 # client = MongoClient('mongodb://%s:%s@backend_mongodb/' % (username, password))
 # client = MongoClient('mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb')
 client = MongoClient('mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb')

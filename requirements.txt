@@ -23,6 +23,9 @@ django-cors-headers==3.5.0
 # distro-info
 # ec2-hibinit-agent==1.0.0
 encoding-tools==0.0.3
+faker==8.11.0
+flower==1.0.0
+future==0.18.2
 # hibagent==1.0.1
 # hibagent
 httplib2==0.9.2
