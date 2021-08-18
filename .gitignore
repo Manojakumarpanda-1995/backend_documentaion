@@ -3,3 +3,5 @@ backend/logs/*
 mmtxt/*
 backend/db.sqlite3
 backend/Logs/*
+mmtxt_id_rsa
+mmtxt_id_rsa.pub
