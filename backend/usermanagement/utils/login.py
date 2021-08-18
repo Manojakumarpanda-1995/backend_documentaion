@@ -31,7 +31,7 @@ def func_login(request_data):
 			}
 		}
 		# request_data = request_data.data
-		print("request_data==>",request_data)
+		# print("request_data==>",request_data)
 		email =request_data["email"]
 		email=email.lower()
 		password=request_data["password"]

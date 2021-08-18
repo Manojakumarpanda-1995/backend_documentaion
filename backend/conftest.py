@@ -29,7 +29,7 @@ fake=faker.Faker()
 pytestmark=pytest.mark.django_db
 @pytest.fixture(autouse=True)
 def enable_db_access_for_all_tests(db):
-    pass
+	pass
 
 @pytest.fixture(autouse=True)
 def setup_superusers():
@@ -90,111 +90,111 @@ def setup_company(setup_superusers,setup_roles):
  
 @pytest.fixture
 def setup_user():
-    user=[
+	user=[
 		{"first_name":"Test","last_name":"User1"
 			,"name":"Test User1","email":"test_user1@gmail.com"
-			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]   	
+			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
 			,"reporting_manager_email":"Rohitkhandelwal@kpmg.com"}
 		,{"first_name":"Test","last_name":"User3"
 			,"name":"Test User3","email":"test_user3@gmail.com"
-			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]   	
+			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
 			,"reporting_manager_email":"Rohitkhandelwal@kpmg.com"}
 		,{"first_name":"Test","last_name":"User2"
 			,"name":"Test User2","email":"test_user2@gmail.com"
-			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]   	
+			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
 			,"reporting_manager_email":"Rohitkhandelwal@kpmg.com"}
 	]
-    
-    return user
+	
+	return user
 
 @pytest.fixture
 def setup_random_user():
-    users=[
+	users=[
 		{"first_name":"test","last_name":"user1","email":"testuser1@kpmg.com","active":True
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	},
+		},
 		{"first_name":"test","last_name":"user2","email":"testuser2@kpmg.com","active":True
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	},
+		},
 		{"first_name":"test","last_name":"user3","email":"testuser3@kpmg.com","active":True
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	},
+		},
 		{"first_name":"test","last_name":"user4","email":"testuser4@kpmg.com","active":False
-   		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user5","email":"testuser5@kpmg.com","active":False
-   		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user6","email":"testuser6@kpmg.com","active":False
-   		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user1","email":"testuser7@kpmg.com","active":False
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user1","email":"testuser8@kpmg.com","active":False
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 	]
-    return users
+	return users
 
 @pytest.fixture
 def setup_saved_user():
-    users=[
+	users=[
 		{"first_name":"test","last_name":"user1","email":"testuser1@kpmg.com","active":True
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	},
+		},
 		{"first_name":"test","last_name":"user2","email":"testuser2@kpmg.com","active":True
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	},
+		},
 		{"first_name":"test","last_name":"user3","email":"testuser3@kpmg.com","active":True
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	},
+		},
 		{"first_name":"test","last_name":"user4","email":"testuser4@kpmg.com","active":False
-   		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user5","email":"testuser5@kpmg.com","active":False
-   		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user6","email":"testuser6@kpmg.com","active":False
-   		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user1","email":"testuser7@kpmg.com","active":False
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 		,{"first_name":"test","last_name":"user1","email":"testuser8@kpmg.com","active":False
-   		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
-     	}
+		}
 	]
-    
-    for obj in users:
-        getUsers=Users.objects.create(**obj)
-        getAccess=AccessManagement.objects.create(name=getUsers)
-    return users
+	
+	for obj in users:
+		getUsers=Users.objects.create(**obj)
+		getAccess=AccessManagement.objects.create(name=getUsers)
+	return users
 
 @pytest.fixture
 def setup_temporary_urls(setup_saved_user,setup_random_user):
@@ -203,11 +203,11 @@ def setup_temporary_urls(setup_saved_user,setup_random_user):
 	for x in range(len(users)):
 		getUser=Users.objects.get(email__iexact=users[x]["email"])
 		temporary_url={"user":getUser
-                ,"token":getUser.token
-                ,"filename":fake.file_name(category="file",extension="xlsx")
-                ,"filepath":fake.file_path(depth=2,category="file",extension="xlsx")
+				,"token":getUser.token
+				,"filename":fake.file_name(category="file",extension="xlsx")
+				,"filepath":fake.file_path(depth=2,category="file",extension="xlsx")
 				,"expiry_time":datetime.now(tz=timezone.utc)
-                }
+				}
 
 		getTemporaryurl=TemporaryURL.objects.create(**temporary_url)
 	
@@ -220,10 +220,10 @@ def setup_activitylogs(setup_saved_user):
 	for x in range(len(users)):
 		getUser=Users.objects.get(email__iexact=users[x]["email"])
 		activity_logs={"user":getUser
-                ,"activity":fake.text(max_nb_chars=70)
-                ,"ip_address":fake.ipv4()
+				,"activity":fake.text(max_nb_chars=70)
+				,"ip_address":fake.ipv4()
 				,"timestamp":datetime.now(tz=timezone.utc)
-                }
+				}
 
 		getActivityLogs=ActivityLogs.objects.create(**activity_logs)
 	
@@ -232,16 +232,16 @@ def setup_activitylogs(setup_saved_user):
 @pytest.fixture
 def setup_register_worker(setup_saved_user):
 	worker_data=[]
-	worker={"name":"Rohit","email":'Rohit@momenttext.com',"active":True
-            ,"phone_no":''.join((random.choice(string.digits) for i in range(10)))
+	worker={"name":"Rohit","email":"Rohit@momenttext.com","active":True
+			,"phone_no":"".join((random.choice(string.digits) for i in range(10)))
 			,"skill_sets":["java","c++","jquery"]
 			,"created_at":fake.date_time(tzinfo=timezone.utc)
-   			,"updated_at":fake.date_time(tzinfo=timezone.utc)}
+			,"updated_at":fake.date_time(tzinfo=timezone.utc)}
 	getWorker=Workers.objects.create(**worker)
 
 	for obj in range(5):
-		worker={"name":fake.name(),"email":fake.email(domain='momenttext.com'),"active":True
-				,"phone_no":''.join((random.choice(string.digits) for i in range(10)))
+		worker={"name":fake.name(),"email":fake.email(domain="momenttext.com"),"active":True
+				,"phone_no":"".join((random.choice(string.digits) for i in range(10)))
 				,"skill_sets":["java","c++","jquery"]
 				,"created_at":fake.date_time(tzinfo=timezone.utc)
 				,"updated_at":fake.date_time(tzinfo=timezone.utc)}
@@ -253,17 +253,17 @@ def setup_register_worker(setup_saved_user):
 @pytest.fixture
 def setup_register_access(setup_saved_user):
 	access_data=[]
-	access={"company_name":"Amazon","name":"Nitin","email":'Nitin@momenttext.com'
-            ,"phone_number":''.join((random.choice(string.digits) for i in range(10)))
+	access={"company_name":"Amazon","name":"Nitin","email":"Nitin@momenttext.com"
+			,"phone_number":"".join((random.choice(string.digits) for i in range(10)))
 			,"skill_sets":["java","c++","jquery"]
 			,"created_at":fake.date_time(tzinfo=timezone.utc)
-   			,"updated_at":fake.date_time(tzinfo=timezone.utc)}
+			,"updated_at":fake.date_time(tzinfo=timezone.utc)}
 	getWorker=AccessRequest.objects.create(**access)
 
 	for obj in range(5):
 		access={"name":fake.name(),"company_name":fake.company()
-				,"email":fake.email(domain='momenttext.com'),"active":False
-				,"phone_number":''.join((random.choice(string.digits) for i in range(10)))
+				,"email":fake.email(domain="momenttext.com"),"active":False
+				,"phone_number":"".join((random.choice(string.digits) for i in range(10)))
 				,"skill_sets":["java","c++","jquery"]
 				,"created_at":fake.date_time(tzinfo=timezone.utc)
 				,"updated_at":fake.date_time(tzinfo=timezone.utc)}
@@ -272,7 +272,50 @@ def setup_register_access(setup_saved_user):
 
 	return access_data
 
-
+@pytest.fixture
+def setup_multiple_invalid(setup_saved_user):
+	
+	users=Users.objects.exclude(id=1)
+	for user in users:
+		getAccess=AccessManagement.objects.get(name=user)
+		getAccess.last_login_attempt=(datetime.now(tz=timezone.utc)
+                                +timedelta(minutes=refresh_lockout+5))
+		getAccess.password_attempts=count_threshold
+		getAccess.save()
+	
+@pytest.fixture
+def setup_multiple_invalid_reset(setup_saved_user):
+	
+	users=Users.objects.exclude(id=1)
+	for user in users:
+		getAccess=AccessManagement.objects.get(name=user)
+		getAccess.last_login_attempt=(datetime.now(tz=timezone.utc)
+                                -timedelta(minutes=refresh_lockout+5))
+		getAccess.password_attempts=count_threshold
+		getAccess.save()
+	
+@pytest.fixture
+def setup_invalid_attempt_update(setup_saved_user):
+	
+	users=Users.objects.exclude(id=1)
+	for user in users:
+		getAccess=AccessManagement.objects.get(name=user)
+		getAccess.last_login_attempt=(datetime.now(tz=timezone.utc)
+                                -timedelta(minutes=refresh_lockout+5))
+		getAccess.password_attempts=count_threshold-3
+		getAccess.save()
+	
+@pytest.fixture
+def setup_invalid_first_attempt(setup_saved_user):
+	
+	users=Users.objects.exclude(id=1)
+	for user in users:
+		getAccess=AccessManagement.objects.get(name=user)
+		getAccess.last_login_attempt=(datetime.now(tz=timezone.utc)
+                                -timedelta(minutes=refresh_lockout-5))
+		getAccess.password_attempts=6
+		getAccess.save()
+	
 
 
 

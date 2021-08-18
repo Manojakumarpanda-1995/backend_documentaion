@@ -67,7 +67,7 @@ class login(APIView,Login_Schema):
 				"Remote_ADDR": request.META["REMOTE_ADDR"]
 			}
 		request_data = {**request_data, **newInfo}
-		print("request_data==>",request.data)
+		# print("request_data==>",request.data)
 		response = func_login(request_data)
 		return Response(response)
 
