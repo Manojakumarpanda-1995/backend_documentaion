@@ -38,7 +38,7 @@ def setup_superusers():
 		"first_name": "Super",
 		"last_name": " User 1",
 		"name": "backend Super User 1",
-		"email": "su1@kpmg.com",
+		"email": "su1@momenttext.com",
 		"password": generate_passwords("Password@123"),
 		"token": uuid.uuid4().hex,
 		"designation": "Test",
@@ -46,7 +46,7 @@ def setup_superusers():
 		"user_verified": True,
 		"reporting_manager_id": "67890",
 		"reporting_manager_name": "Rohit Khandelwal",
-		"reporting_manager_email": "Rohitkhandelwal@kpmg.com",
+		"reporting_manager_email": "Rohitkhandelwal@momenttext.com",
 		"hashkey": uuid.uuid1().hex
 	}]
 	for user in users:
@@ -97,21 +97,21 @@ def setup_user():
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
-			,"reporting_manager_email":"Rohitkhandelwal@kpmg.com"}
+			,"reporting_manager_email":"Rohitkhandelwal@momenttext.com"}
 		,{"first_name":"Test","last_name":"User3"
 			,"name":"Test User3","email":"test_user3@gmail.com"
 			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
-			,"reporting_manager_email":"Rohitkhandelwal@kpmg.com"}
+			,"reporting_manager_email":"Rohitkhandelwal@momenttext.com"}
 		,{"first_name":"Test","last_name":"User2"
 			,"name":"Test User2","email":"test_user2@gmail.com"
 			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
-			,"reporting_manager_email":"Rohitkhandelwal@kpmg.com"}
+			,"reporting_manager_email":"Rohitkhandelwal@momenttext.com"}
 	]
 	
 	return user
@@ -119,35 +119,35 @@ def setup_user():
 @pytest.fixture
 def setup_random_user():
 	users=[
-		{"first_name":"test","last_name":"user1","email":"testuser1@kpmg.com","active":True
+		{"first_name":"test","last_name":"user1","email":"testuser1@momenttext.com","active":True
 		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		},
-		{"first_name":"test","last_name":"user2","email":"testuser2@kpmg.com","active":True
+		{"first_name":"test","last_name":"user2","email":"testuser2@momenttext.com","active":True
 		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		},
-		{"first_name":"test","last_name":"user3","email":"testuser3@kpmg.com","active":True
+		{"first_name":"test","last_name":"user3","email":"testuser3@momenttext.com","active":True
 		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		},
-		{"first_name":"test","last_name":"user4","email":"testuser4@kpmg.com","active":False
+		{"first_name":"test","last_name":"user4","email":"testuser4@momenttext.com","active":False
 		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
-		,{"first_name":"test","last_name":"user5","email":"testuser5@kpmg.com","active":False
+		,{"first_name":"test","last_name":"user5","email":"testuser5@momenttext.com","active":False
 		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
-		,{"first_name":"test","last_name":"user6","email":"testuser6@kpmg.com","active":False
+		,{"first_name":"test","last_name":"user6","email":"testuser6@momenttext.com","active":False
 		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
-		,{"first_name":"test","last_name":"user1","email":"testuser7@kpmg.com","active":False
+		,{"first_name":"test","last_name":"user1","email":"testuser7@momenttext.com","active":False
 		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
-		,{"first_name":"test","last_name":"user1","email":"testuser8@kpmg.com","active":False
+		,{"first_name":"test","last_name":"user1","email":"testuser8@momenttext.com","active":False
 		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
@@ -155,46 +155,91 @@ def setup_random_user():
 	return users
 
 @pytest.fixture
-def setup_saved_user():
+def setup_user_without_access():
 	users=[
-		{"first_name":"test","last_name":"user1","email":"testuser1@kpmg.com","active":True
-		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		{"first_name":"test","last_name":"user1","email":"testuser1@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		},
-		{"first_name":"test","last_name":"user2","email":"testuser2@kpmg.com","active":True
-		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		{"first_name":"test","last_name":"user2","email":"testuser2@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		},
-		{"first_name":"test","last_name":"user3","email":"testuser3@kpmg.com","active":True
-		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		{"first_name":"test","last_name":"user3","email":"testuser3@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		},
-		{"first_name":"test","last_name":"user4","email":"testuser4@kpmg.com","active":False
+		{"first_name":"test","last_name":"user4","email":"testuser4@momenttext.com","active":True
 		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
-		,{"first_name":"test","last_name":"user5","email":"testuser5@kpmg.com","active":False
-		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
-		   ,"hashkey":fake.uuid4()[:10],
-		}
-		,{"first_name":"test","last_name":"user6","email":"testuser6@kpmg.com","active":False
-		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
-		   ,"hashkey":fake.uuid4()[:10],
-		}
-		,{"first_name":"test","last_name":"user1","email":"testuser7@kpmg.com","active":False
-		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
-		   ,"hashkey":fake.uuid4()[:10],
-		}
-		,{"first_name":"test","last_name":"user1","email":"testuser8@kpmg.com","active":False
-		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
-		   ,"hashkey":fake.uuid4()[:10],
-		}
+		
 	]
 	
 	for obj in users:
 		getUsers=Users.objects.create(**obj)
+	return users
+
+@pytest.fixture
+def setup_saved_user():
+	users=[
+		{"first_name":"test","last_name":"user1","email":"testuser1@momenttext.com","active":True
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		},
+		{"first_name":"test","last_name":"user2","email":"testuser2@momenttext.com","active":True
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		},
+		{"first_name":"test","last_name":"user3","email":"testuser3@momenttext.com","active":True
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		},
+		{"first_name":"test","last_name":"user4","email":"testuser4@momenttext.com","active":False
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user5","email":"testuser5@momenttext.com","active":False
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user6","email":"testuser6@momenttext.com","active":False
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user1","email":"testuser7@momenttext.com","active":False
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user1","email":"testuser8@momenttext.com","active":False
+		,"user_verified":False,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+	]
+	otp=""
+	for obj in users:
+		getUsers=Users.objects.create(**obj)
 		getAccess=AccessManagement.objects.create(name=getUsers)
 	return users
+		
+@pytest.fixture  
+def setup_update_password(setup_random_user):
+	users=setup_random_user  
+	for x in range(len(users)//2):
+		getUsers=Users.objects.create(**users[x])
+		getAccess=AccessManagement.objects.create(name=getUsers)
+		getAccess.otp=encryption("4yT28GN7")
+		getAccess.otp_expiry_time=datetime.now(tz=timezone.utc)+timedelta(minutes=20)
+		getAccess.otp_attempts = 2
+		getAccess.save()
+  
+	for x in range(len(users)//2,len(users)):
+		getUsers=Users.objects.create(**users[x])
+		getAccess=AccessManagement.objects.create(name=getUsers)
+		getAccess.otp=encryption("4yT28GN7")
+		getAccess.otp_attempts=2
+		getAccess.otp_expiry_time=datetime.now(tz=timezone.utc)-timedelta(minutes=20)
+		getAccess.save()
 
 @pytest.fixture
 def setup_temporary_urls(setup_saved_user,setup_random_user):
@@ -314,6 +359,52 @@ def setup_invalid_first_attempt(setup_saved_user):
 		getAccess.last_login_attempt=(datetime.now(tz=timezone.utc)
                                 -timedelta(minutes=refresh_lockout-5))
 		getAccess.password_attempts=6
+		getAccess.save()
+
+@pytest.fixture
+def setup_multiple_invalid_for_pass_reset(setup_saved_user):
+	
+	users=Users.objects.exclude(id=1)
+	for x in range(len(users)//2):
+		getAccess=AccessManagement.objects.get(name=users[x])
+		getAccess.last_password_reset_request=(datetime.now(tz=timezone.utc)
+                                +timedelta(minutes=refresh_lockout+5))
+		getAccess.password_reset_request_count=count_threshold
+		getAccess.save()
+	for x in range(len(users)//2,len(users)):
+		getAccess=AccessManagement.objects.get(name=users[x])
+		getAccess.last_password_reset_request=(datetime.now(tz=timezone.utc)
+                                -timedelta(minutes=refresh_lockout+5))
+		getAccess.password_reset_request_count=count_threshold
+		getAccess.save()
+	
+@pytest.fixture
+def setup_update_password_access_counter(setup_saved_user):
+	
+	users=Users.objects.exclude(id=1)
+	for x in range(len(users)//2):
+		getAccess=AccessManagement.objects.get(name=users[x])
+		getAccess.last_password_reset_request=(datetime.now(tz=timezone.utc)
+                                +timedelta(minutes=refresh_lockout+5))
+		getAccess.last_otp_attempt=(datetime.now(tz=timezone.utc)
+                                +timedelta(minutes=refresh_lockout+5))
+		getAccess.otp_expiry_time=(datetime.now(tz=timezone.utc)
+                                +timedelta(minutes=refresh_lockout+5))
+		getAccess.password_reset_request_count=2
+		getAccess.otp_attempts=4
+		getAccess.otp=encryption("yGTN8427")
+		getAccess.save()
+	for x in range(len(users)//2,len(users)):
+		getAccess=AccessManagement.objects.get(name=users[x])
+		getAccess.last_password_reset_request=(datetime.now(tz=timezone.utc)
+                                -timedelta(minutes=refresh_lockout+5))
+		getAccess.last_otp_attempt=(datetime.now(tz=timezone.utc)
+                                -timedelta(minutes=refresh_lockout+5))
+		getAccess.otp_expiry_time=(datetime.now(tz=timezone.utc)
+                                +timedelta(minutes=refresh_lockout+5))
+		getAccess.password_reset_request_count=3
+		getAccess.otp_attempts=4
+		getAccess.otp=encryption("yGTN8427")
 		getAccess.save()
 	
 

@@ -22,7 +22,7 @@ error_logs = getattr(settings, "ERROR_LOGS_DB", None)
 
 
 def func_reset_password_request(request_data):
-	logging.info("request_data==>",str(request_data))
+	# logging.info("request_data==>",str(request_data))
 	try:
 		response = {}
 		
@@ -84,7 +84,7 @@ def func_reset_password_request(request_data):
 				curr_access.save()
 
 		np = random_alphaNumeric_string(4, 4)
-		logging.info("otp is==> "+str(np))
+		# logging.info("otp is==> "+str(np))
 		curr_access.otp = encryption(np)
 		curr_access.otp_attempts = 0
 		curr_access.last_otp_attempt = None
@@ -104,14 +104,14 @@ def func_reset_password_request(request_data):
 			curr_access.save()
 
 		subject= "Backend | Reset Password - " + datetime.date.today().strftime("%d-%m-%Y")
-		logging.info("started_working")
+		# logging.info("started_working")
 		# # Celery
-		send_email.delay(str({"email": curr_user.email,
-								"subject": subject,
-								"template_name": "otp_mail", 
-								"variables": [curr_user.email, np, curr_user.email],
-								"email_type": "plain"
-								}))
+		# send_email.delay(str({"email": curr_user.email,
+		# 						"subject": subject,
+		# 						"template_name": "otp_mail", 
+		# 						"variables": [curr_user.email, np, curr_user.email],
+		# 						"email_type": "plain"
+		# 						}))
 		# SendEmail(curr_user.email, subject, template_name="otp_mail", variables=["password"])
 
 

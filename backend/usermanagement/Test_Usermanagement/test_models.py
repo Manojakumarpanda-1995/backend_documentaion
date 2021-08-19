@@ -24,7 +24,7 @@ class Test_users_models():
 		assert Users.objects.count()==len(setup_user)+1
 		getUsers=Users.objects.all()
 		for x in range(len(users)):
-			assert getUsers[0].email	== "su1@kpmg.com"
+			assert getUsers[0].email	== "su1@momenttext.com"
 			assert getUsers[x+1].email	== users[x]["email"]
 			assert getUsers[x+1].first_name == users[x]["first_name"]
 			assert getUsers[x+1].last_name == users[x]["last_name"]
@@ -35,7 +35,7 @@ class Test_users_models():
 			assert len(getUsers[x+1].hashkey)==10
 			assert getUsers[x].reporting_manager_id==67890
 			assert getUsers[x].reporting_manager_name=="Rohit Khandelwal"
-			assert getUsers[x].reporting_manager_email=="Rohitkhandelwal@kpmg.com"
+			assert getUsers[x].reporting_manager_email=="Rohitkhandelwal@momenttext.com"
 			assert len(getUsers)==AccessManagement.objects.count()
 			
 	def test_random_user(self,setup_random_user):	 
@@ -53,11 +53,11 @@ class Test_users_models():
 		assert len(Users.objects.filter(active=False,user_verified=False))==2
 	
 	@pytest.mark.parametrize("email,status,user_verified",[
-		("testuser1@kpmg.com",True,False),("testuser2@kpmg.com",True,False)
-		,("testuser3@kpmg.com",True,False),
-		("testuser4@kpmg.com",False,True),("testuser5@kpmg.com",False,True)
-		,("testuser6@kpmg.com",False,True),
-		("testuser7@kpmg.com",False,False),("testuser8@kpmg.com",False,False)
+		("testuser1@momenttext.com",True,False),("testuser2@momenttext.com",True,False)
+		,("testuser3@momenttext.com",True,False),
+		("testuser4@momenttext.com",False,True),("testuser5@momenttext.com",False,True)
+		,("testuser6@momenttext.com",False,True),
+		("testuser7@momenttext.com",False,False),("testuser8@momenttext.com",False,False)
 		])	  
 	def test_user_status(self,email,status,user_verified,setup_random_user):
 		users=setup_random_user
@@ -77,11 +77,11 @@ class Test_users_models():
 		assert getAccess[0].name.email==email
 		
 	@pytest.mark.parametrize("email,status,user_verified",[
-		("testuser1@kpmg.com",True,False),("testuser2@kpmg.com",True,False)
-		,("testuser3@kpmg.com",True,False),
-		("testuser4@kpmg.com",False,True),("testuser5@kpmg.com",False,True)
-		,("testuser6@kpmg.com",False,True),
-		("testuser7@kpmg.com",False,False),("testuser8@kpmg.com",False,False)
+		("testuser1@momenttext.com",True,False),("testuser2@momenttext.com",True,False)
+		,("testuser3@momenttext.com",True,False),
+		("testuser4@momenttext.com",False,True),("testuser5@momenttext.com",False,True)
+		,("testuser6@momenttext.com",False,True),
+		("testuser7@momenttext.com",False,False),("testuser8@momenttext.com",False,False)
 		])	
 	def test_access_status(self,email,status,user_verified,setup_saved_user):
 		getAccess=AccessManagement.objects.get(name__email=email)
@@ -146,11 +146,11 @@ class Test_users_models():
 		assert getRoles.updated_by_id==Users.objects.get(id=1).id
 
 	@pytest.mark.parametrize("email,status,user_verified",[
-		("testuser1@kpmg.com",True,False),("testuser2@kpmg.com",True,False)
-		,("testuser3@kpmg.com",True,False),
-		("testuser4@kpmg.com",False,True),("testuser5@kpmg.com",False,True)
-		,("testuser6@kpmg.com",False,True),
-		("testuser7@kpmg.com",False,False),("testuser8@kpmg.com",False,False)
+		("testuser1@momenttext.com",True,False),("testuser2@momenttext.com",True,False)
+		,("testuser3@momenttext.com",True,False),
+		("testuser4@momenttext.com",False,True),("testuser5@momenttext.com",False,True)
+		,("testuser6@momenttext.com",False,True),
+		("testuser7@momenttext.com",False,False),("testuser8@momenttext.com",False,False)
 		])
 	def test_temporaryurl(self,email,status,user_verified,setup_temporary_urls):
 		
@@ -184,11 +184,11 @@ class Test_users_models():
 			assert getUrl[0].user.token==Users.objects.get(email=users[x]["email"]).token
    
 	@pytest.mark.parametrize("email,status,user_verified",[
-		("testuser1@kpmg.com",True,False),("testuser2@kpmg.com",True,False)
-		,("testuser3@kpmg.com",True,False),
-		("testuser4@kpmg.com",False,True),("testuser5@kpmg.com",False,True)
-		,("testuser6@kpmg.com",False,True),
-		("testuser7@kpmg.com",False,False),("testuser8@kpmg.com",False,False)
+		("testuser1@momenttext.com",True,False),("testuser2@momenttext.com",True,False)
+		,("testuser3@momenttext.com",True,False),
+		("testuser4@momenttext.com",False,True),("testuser5@momenttext.com",False,True)
+		,("testuser6@momenttext.com",False,True),
+		("testuser7@momenttext.com",False,False),("testuser8@momenttext.com",False,False)
 		])
 	def test_activitylogs(self,email,status,user_verified,setup_activitylogs):
 		
