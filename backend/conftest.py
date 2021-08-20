@@ -407,10 +407,89 @@ def setup_update_password_access_counter(setup_saved_user):
 		getAccess.otp=encryption("yGTN8427")
 		getAccess.save()
 	
+@pytest.fixture
+def setup_user_for_new_password():
+	users=[
+		{"first_name":"test","last_name":"user1","email":"testuser1@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		},
+		{"first_name":"test","last_name":"user2","email":"testuser2@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		},
+		{"first_name":"test","last_name":"user3","email":"testuser3@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		},
+		{"first_name":"test","last_name":"user4","email":"testuser4@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user5","email":"testuser5@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user6","email":"testuser6@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user1","email":"testuser7@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+		,{"first_name":"test","last_name":"user1","email":"testuser8@momenttext.com","active":True
+		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
+		   ,"hashkey":fake.uuid4()[:10],
+		}
+	]
+	otp=""
+	for obj in users:
+		getUsers=Users.objects.create(**obj)
+		getAccess=AccessManagement.objects.create(name=getUsers)
+	return users
 
+@pytest.fixture(autouse=True)
+def setup_users_roles(setup_superusers,setup_roles):
+	try:
+		users=[
+			{"first_name":"Company","last_name":"Admin","email":"companyadmin@momenttext.com","active":True
+			,"user_verified":True,"password":generate_passwords("Password@1234567"),"token":fake.uuid4()
+			,"hashkey":fake.uuid4()[:10],
+			},
+			{"first_name":"project","last_name":"Admin","email":"projectadmin@momenttext.com","active":True
+			,"user_verified":True,"password":generate_passwords("Password@1237654"),"token":fake.uuid4()
+			,"hashkey":fake.uuid4()[:10],
+			},
+			{"first_name":"Test","last_name":"User","email":"testuser@momenttext.com","active":True
+			,"user_verified":True,"password":generate_passwords("Password@1232424"),"token":fake.uuid4()
+			,"hashkey":fake.uuid4()[:10],
+			},
+			{"first_name":"End","last_name":"User","email":"user@momenttext.com","active":True
+			,"user_verified":True,"password":generate_passwords("Password@1231212"),"token":fake.uuid4()
+			,"hashkey":fake.uuid4()[:10],
+			}
+			]
+	
+		getSuperUser= Users.objects.filter(id=1)[0]
+		company ={"name": "Google","created_by":getSuperUser,"updated_by": getSuperUser}
+		getCompany = Company.objects.create(**company)
+		roles=[2,3,4,4]
+		for x in range(len(users)):
+			users[x]["name"]=users[x]["first_name"]+" "+users[x]["last_name"]
+			getUser=Users.objects.create(**users[x])
+			getAccess=AccessManagement.objects.create(name=getUser)
+			companyRole={"role":roles[x]}
+			companyRole["created_by"] =getSuperUser
+			companyRole["updated_by"] =getSuperUser
+			companyRole["user"] =getUser
+			companyRole["company"] = getCompany
+			companyRole["role"] = Roles.objects.filter(id=roles[x])[0]
+			getUserCompanyRole = UserCompanyRole.objects.create(**companyRole)
 
-
-
+		return users
+	except Exception as e:
+		print("Exception at==>",e)
 
 
 

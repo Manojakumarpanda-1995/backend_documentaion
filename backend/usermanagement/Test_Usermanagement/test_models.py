@@ -212,7 +212,6 @@ class Test_users_models():
 			assert len(getActivity[0].ip_address.split("."))==4
 			assert getActivity[0].user.token==Users.objects.get(email=users[x]["email"]).token
 		
-
 class Test_worker_models():
     
 	def test_worker(self,setup_register_worker):

@@ -62,7 +62,7 @@ def func_edit_company_info(request_data, token):
 		apiParamsInfo = {}
 		for key, value in request_data.items():
 			if key not in ["Client_IP_Address", "Remote_ADDR", "Requested_URL"]:
-				apiParamsInfo[key] = value
+				apiParamsInfo[key] = value[0]
 
 		changed_values = []
 
@@ -85,10 +85,16 @@ def func_edit_company_info(request_data, token):
 
 				for key, value in apiParamsInfo.items():
 					if key in [f.name for f in getCompanyInfo._meta.get_fields()]:
-						changed_values.append((getattr(getCompanyInfo, key), apiParamsInfo[key]))
+						if key !="logo":
+							changed_values.append((getattr(getCompanyInfo, key), apiParamsInfo[key]))
 						setattr(getCompanyInfo, key, apiParamsInfo[key])
+      
+				for key, value in apiParamsInfo.items():
+					if key in [f.name for f in getCompany._meta.get_fields()]:
+						changed_values.append((getattr(getCompany, key), apiParamsInfo[key]))
+						setattr(getCompany, key, apiParamsInfo[key])
 
-				getCompanyInfo.save()
+				getCompany.save()
 
 				logs["data"]["data_fields"] = [changed_values]
 				logs["data"]["status_message"] = "company information data updated successfully."
