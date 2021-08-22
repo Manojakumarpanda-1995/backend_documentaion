@@ -20,8 +20,8 @@ class CheckToken:
 			# 			,"update-password"] and request.META["REQUEST_METHOD"] == "POST":
 			
 			if request.META["PATH_INFO"].strip("/").split("/")[-1] not in ["loginapi"
-						,"register-user"
-						,"reset-password","logout"
+						,"register-user","register-worker"
+						,"reset-password","logout","register-access-request"
 						,"update-password"] and request.META["REQUEST_METHOD"] == "POST":
 			
 				# logging.info(request.META.get("HTTP_AUTHORIZATION",0))

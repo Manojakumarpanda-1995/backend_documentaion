@@ -20,7 +20,7 @@ actvity_logs = getattr(settings, "ACTIVITY_LOGS_DB", None)
 error_logs = getattr(settings, "ERROR_LOGS_DB", None)
 
 #To validate email in the format of foo./_/+/123@some.com 
-#0->invalid,1->valid
+# 0->invalid,1->valid
 def validate_email(email):
 	try:
 		if (re.search("[!#$%^&*()?=,<>/]",email)):
@@ -96,25 +96,25 @@ def func_register_worker(request_data):
 															)
 
 				#Celery
-				send_email.delay(str({"email": emails,
-										"subject": "New Registration",
-										# "template_name": "generate_passwords", 
-										"template_name": message,
-										# "variables": [decryption(apiParamsInfo['password'])],
-										"email_type": "plain"
-										}))
+				# send_email.delay(str({"email": emails,
+				# 						"subject": "New Registration",
+				# 						# "template_name": "generate_passwords", 
+				# 						"template_name": message,
+				# 						# "variables": [decryption(apiParamsInfo['password'])],
+				# 						"email_type": "plain"
+				# 						}))
 
 				# logging.info("emails==>{}".format(emails))
 				logs["data"]["data_fields"] = [apiParamsInfo["name"], apiParamsInfo["email"]]
 				logs["data"]["status_message"] = "Workers registered successfully."
 				response["data"] = getWorker.id
-				response['message'] = 'Workers registered successfully .'
+				response['message'] = 'Workers registered successfully.'
 				response["statuscode"] = 200
 
 			else:
 				if len(getWorker)==0:
-					logs["data"]["status_message"] = "Workers name can't be left blak."
-					response['message'] = "Workers name can't be left blak."
+					logs["data"]["status_message"] = "Workers name can't be left blank."
+					response['message'] = "Workers name can't be left blank."
 				else:
 					logs["data"]["status_message"] = "Workers already registered."
 					response['message'] = "Workers already registered."

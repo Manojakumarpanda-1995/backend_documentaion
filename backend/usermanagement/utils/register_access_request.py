@@ -69,7 +69,7 @@ def func_register_access_request(request_data):
 		 
 		#To check for the duplicate company
 		getCompanyId = None
-		spcl_company_name = re.sub('[^A-Za-z0-9\s]+', '', apiParamsInfo["name"])
+		spcl_company_name = re.sub('[^A-Za-z0-9\s]+', '', apiParamsInfo["company_name"])
 		getCompany = Company.objects.all().values("name", "id")
 			
 		for comp in getCompany:
@@ -79,7 +79,8 @@ def func_register_access_request(request_data):
 				getCompanyId = comp["id"]
 				break
 
-		if getCompanyId is not None:
+		getCompany=Company.objects.filter(name__iexact=apiParamsInfo["company_name"])
+		if getCompanyId is not None or len(getCompany):
 			logs["data"]["status_message"] = "Company with this name already registered. To claim contact with admin."
 			response['message'] = "Company with this name already registered. To claim contact with admin."
 
@@ -99,8 +100,8 @@ def func_register_access_request(request_data):
 				return response
 			
 			#To validate that name should not blank 
-			getName = 0 if request_data.get("name",None) is None else 1
-			getCompany=Company.objects.filter(name__iexact=apiParamsInfo["name"])
+			getName = 0 if request_data.get("company_name",None) is None else 1
+			getCompany=Company.objects.filter(name__iexact=apiParamsInfo["company_name"])
 			getAccess=AccessRequest.objects.filter(email__iexact=apiParamsInfo["email"])
 
 			if getName != 0 and len(getAccess)==0:
@@ -114,28 +115,28 @@ def func_register_access_request(request_data):
 								 					apiParamsInfo['name']
 							 					,getAccess.email))
 				
-				# Celery
-				send_email.delay(str({"email": emails,
-										"subject": "New Company Registration", 
-										# "template_name": "generate_passwords", 
-										"template_name": message,
-										# "variables": [decryption(apiParamsInfo['password'])],
-										"variables": ['password'],
-										# "variables": [decryption(apiParamsInfo['password'])],
-										"email_type": "plain"
-										}))
+				# # Celery
+				# send_email.delay(str({"email": emails,
+				# 						"subject": "New Company Registration", 
+				# 						# "template_name": "generate_passwords", 
+				# 						"template_name": message,
+				# 						# "variables": [decryption(apiParamsInfo['password'])],
+				# 						"variables": ['password'],
+				# 						# "variables": [decryption(apiParamsInfo['password'])],
+				# 						"email_type": "plain"
+				# 						}))
 
 				# logging.info("emails==>{}".format(emails))
-				logs["data"]["data_fields"] = [apiParamsInfo["name"], apiParamsInfo["email"]]
+				logs["data"]["data_fields"] = [apiParamsInfo["company_name"], apiParamsInfo["email"]]
 				logs["data"]["status_message"] = "Access requests registered successfully."
 				response["data"] = getAccess.id
-				response['message'] = 'Access requests registered successfully .'
+				response['message'] = 'Access requests registered successfully.'
 				response["statuscode"] = 200
 
 			else:
 				if len(getAccess)==0:
-					logs["data"]["status_message"] = "Access requests name can't be left blak."
-					response['message'] = "Access requests name can't be left blak."
+					logs["data"]["status_message"] = "Access requests name can't be left blank."
+					response['message'] = "Access requests name can't be left blank."
 				else:
 					logs["data"]["status_message"] = "Access requests with this email already registered."
 					response['message'] = "Access requests with this email already registered."

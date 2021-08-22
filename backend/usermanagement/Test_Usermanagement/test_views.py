@@ -1,5 +1,6 @@
 import json
-
+import string
+import random
 import pytest
 from django import dispatch
 # from usermanagement.utils.store_activity_logs import func_store_activity_logs
@@ -55,7 +56,6 @@ class Test_login():
 							 ,content_type="application/json")
 		assert response.status_code==200
 		response=response.json()
-		# print("response==>",response)
 		assert response["statuscode"]==200
 		assert response["token"]==Users.objects.get(email=email).token
 		assert response["name"]==name
@@ -275,7 +275,6 @@ class Test_reset_password():
 		assert response.status_code==200
 		response=response.json()
 		assert response["statuscode"]==400
-		# print("assert ==>",response["message"])
 		assert response["message"]=="User Access for email {} does not exists in the database.".format(email)
 
 	#Test cases with invalid email emails of user
@@ -968,9 +967,190 @@ class Test_register_user():
 		assert response["statuscode"]==400
       
 class Test_register_worker():
-	def test_register_worker(self,client):
+    
+    #Test cases for register worker with all valid data
+	def test_register_worker_with_valid_data(self,client):
 		request=reverse("usermanagement:register-worker")
+		data=json.dumps({"email":"Worker@email.com","name":"Worker",
+				"phone_no":"9058908242","skill_sets":["Java","Python","c"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["message"]=="Workers registered successfully."
+		assert response["data"] is not None
+		assert response["statuscode"]==200
 
+    #Test cases for register worker with existing users in Worker tables
+	@pytest.mark.parametrize("email",[("Rohit@momenttext.com")])
+	def test_register_worker_existing_worker(self,client,email,setup_register_worker):
+		request=reverse("usermanagement:register-worker")
+		data=json.dumps({"name":"Rohit","email":email
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Workers already registered."
+  
+    #Test cases for register worker with invalid email format
+	@pytest.mark.parametrize("email",[("roh#it@momenttext.com")
+							,("ran!jit@momenttext.com")
+							,("ron&it@momenttext.com")
+							,("rob*in@momenttext.com")
+							,("kart$#ik@momenttext.com")
+                                   ])
+	def test_register_worer_with_invalid_email(self,client,email,setup_register_worker):
+		request=reverse("usermanagement:register-worker")
+		data=json.dumps({"name":"Rohit","email":email
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Please try to add valid email."
+  
+    #Test cases for register worker with existing users in Users tables
+	@pytest.mark.parametrize("email",[
+     	("testuser1@momenttext.com")
+		,("testuser2@momenttext.com")
+		,("testuser3@momenttext.com")
+		,("testuser4@momenttext.com")])
+	def test_register_worker_with_existing_user(self,client,email,setup_register_worker):
+		request=reverse("usermanagement:register-worker")
+		data=json.dumps({"name":"Rohit","email":email
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Users with this email id's already exists. Try an another email."
+
+	#Test cases of register worker api with missing parameters
+	def test_register_worker_with_missing_parameter(self,client):
+		request=reverse("usermanagement:register-worker")
+		data=json.dumps({"email":"testuser@email.com"
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Workers name can't be left blank."
+  
+	#Test cases of register worker api without email parameters
+	def test_register_worker_without_email_parameter(self,client):
+		request=reverse("usermanagement:register-worker")
+		data=json.dumps({"name":fake.name()
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+		       
+class Test_register_access():
+
+	#Test cases for register access request with all valid data
+	def test_register_access_with_valid_data(self,client):
+		request=reverse("usermanagement:register-access-request")
+		data=json.dumps({"company_name":fake.company(),"name":"Jatin"
+                   ,"email":"Jatin@momenttext.com"
+			,"phone_number":"".join((random.choice(string.digits) for i in range(10)))
+			,"skill_sets":["java","c++","jquery"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["message"]=="Access requests registered successfully."
+		assert response["statuscode"]==200
+		assert response["data"] is not None
+
+	#Test cases for register access with existing users in Worker tables
+	@pytest.mark.parametrize("email",[("Nitin@momenttext.com")])
+	def test_register_access_request_existing_users(self,client,email
+                        ,setup_register_access):
+		request=reverse("usermanagement:register-access-request")
+		data=json.dumps({"name":"Nitin","company_name":fake.company(),"email":email
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Access requests with this email already registered."
+  
+    #Test cases for register access request with invalid email format
+	@pytest.mark.parametrize("email",[("roh#it@momenttext.com")
+							,("ran!jit@momenttext.com")
+							,("ron&it@momenttext.com")
+							,("rob*in@momenttext.com")
+							,("kart$#ik@momenttext.com")
+                                   ])
+	def test_register_access_request_with_invalid_email(self,client,email):
+		request=reverse("usermanagement:register-access-request")
+		data=json.dumps({"company_name":fake.company(),"email":email
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Please try to add valid email."
+  
+    #Test cases for register access request with existing users in Users tables
+	@pytest.mark.parametrize("email",[
+     	("testuser1@momenttext.com")
+		,("testuser2@momenttext.com")
+		,("testuser3@momenttext.com")
+		,("testuser4@momenttext.com")
+  		])
+	def test_register_access_request_with_existing_user(self,client,email,setup_saved_user):
+		request=reverse("usermanagement:register-access-request")
+		data=json.dumps({"company_name":"Amazons","name":"Nitin","email":email
+			,"phone_number":"".join((random.choice(string.digits) for i in range(10)))
+			,"skill_sets":["java","c++","jquery"]})		
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Users with this email id's already exists. Try an another email."
+
+	#Test cases of register access api with missing parameters
+	def test_register_access_request_with_missing_parameter(self,client):
+		request=reverse("usermanagement:register-access-request")
+		data=json.dumps({"company_name":"TCS","email":"testuser@email.com"
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+  
+	#Test cases of register access request api without company name in parameters
+	def test_register_access_request_without_company_name_parameter(self,client):
+		request=reverse("usermanagement:register-access-request")
+		data=json.dumps({"name":fake.name()
+                   ,"phone_no":"987420937","skill_set":["jquery","json"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+		# assert response["message"]=="Access requests name can't be left blank."
+		       
+	#Test cases of register access request api with exsting company
+	@pytest.mark.parametrize("name",[
+		("Gmail")#,("Amazon"),("Tesla")
+				#,("Infosys"),("Tata")
+				])
+	def test_register_access_request_with_existing_company(self,client,name,setup_company):
+		request=reverse("usermanagement:register-access-request")
+		data=json.dumps({"company_name":name,"name":"Nitin","email":fake.email(domain="momenttext.com")
+			,"phone_number":"".join((random.choice(string.digits) for i in range(10)))
+			,"skill_sets":["java","c++","jquery"]})
+		response=client.post(request,data=data,content_type="application/json")
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Company with this name already registered. To claim contact with admin."
+		       
+@pytest.mark.xfail    
+class Test_edit_user():
+	def test_edit_user(self,client):
+		request=reverse("usermanagement:edit-user")
 
 
 
@@ -1040,14 +1220,6 @@ class Test_register_worker():
 class Test_download_file():
 	def test_download_file(self,client):
 		request=reverse("usermanagement:download-file")
-@pytest.mark.xfail        
-class Test_register_access():
-	def test_register_access(self,client):
-		request=reverse("usermanagement:register-access-request")
-@pytest.mark.xfail    
-class Test_edit_user():
-	def test_edit_user(self,client):
-		request=reverse("usermanagement:edit-user")
 @pytest.mark.xfail    
 class Test_edit_user_byid():
 	def test_edit_user_byid(self,client):

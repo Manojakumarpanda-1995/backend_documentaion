@@ -491,6 +491,22 @@ def setup_users_roles(setup_superusers,setup_roles):
 	except Exception as e:
 		print("Exception at==>",e)
 
+@pytest.fixture(autouse=True)
+def setup_company(setup_superusers):
+	try:
+		getSuperUser= Users.objects.filter(id=1)[0]
+		companies =[{"name": "Google","created_by":getSuperUser,"updated_by": getSuperUser}
+				,{"name":"Gmail","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Amazon","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Tesla","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Infosys","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Tata","created_by":getSuperUser,"updated_by":getSuperUser}
+				]	
+		for company in companies:
+			getCompany = Company.objects.create(**company)
+	except Exception as e:
+		print("Exception at==>",e)
+
 
 
 
