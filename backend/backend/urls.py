@@ -3,7 +3,7 @@ from re import template
 from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls import url
-import organization,usermanagement,project
+# import organization,usermanagement,project
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic.base import TemplateView
@@ -11,7 +11,6 @@ from django.views.generic import RedirectView
 from rest_framework_swagger.views import get_swagger_view
 from rest_framework.schemas import get_schema_view
 from rest_framework.documentation import include_docs_urls
-from usermanagement import views
 
 schema_view = get_swagger_view(title='backend API')
 

@@ -1510,77 +1510,185 @@ class Test_deactivate_user():
 		assert Users.objects.get(id=1).active==False
 		assert response["statuscode"]==200
 		assert response["message"]=="User deactivated successfully."
-
          
 class Test_list_user_byemail():
-	def test_list_user_byemail(self,client):
+    
+     #Test cases for listing user byemail request with all valid data
+	def test_list_user_byemail_with_valid_data(self,client,setup_user_for_new_password):
 		request=reverse("usermanagement:list-user-byemail")
+		email="testuser1@momenttext.com"
+		data=json.dumps({"email":email})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="testuser1@momenttext.com").token}
+		getUser=Users.objects.get(email=email)
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Users listed successfully."
+		assert response["data"]["id"]==getUser.id
+		assert response["data"]["first_name"]==getUser.first_name
+		assert response["data"]["last_name"]==getUser.last_name
+		assert response["data"]["name"]==getUser.name
+		assert response["data"]["email"]==getUser.email
+		assert response["data"]["status"]==getUser.active
+		assert response["data"]["designation"]==getUser.designation
+		assert response["data"]["reporting_manager_id"]==getUser.reporting_manager_id
+		assert response["data"]["reporting_manager_name"]==getUser.reporting_manager_name
+		assert response["data"]["reporting_manager_email"]==getUser.reporting_manager_email
 
+    #Test cases for listing user request with all users
+	@pytest.mark.parametrize("email",[
+					("testuser1@momenttext.com")
+					,("testuser2@momenttext.com")
+					,("testuser3@momenttext.com")
+					,("testuser4@momenttext.com")
+					,("testuser5@momenttext.com")])
+	def test_list_user_byemail_with_all_user(self,client,email
+                        ,setup_user_for_new_password):
+		request=reverse("usermanagement:list-user-byemail")
+		getUser=Users.objects.get(email=email)
+		data=json.dumps({"email":email})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Users listed successfully."
+		assert response["data"]["id"]==getUser.id
+		assert response["data"]["first_name"]==getUser.first_name
+		assert response["data"]["last_name"]==getUser.last_name
+		assert response["data"]["name"]==getUser.name
+		assert response["data"]["email"]==getUser.email
+		assert response["data"]["status"]==getUser.active
+		assert response["data"]["designation"]==getUser.designation
+		assert response["data"]["reporting_manager_id"]==getUser.reporting_manager_id
+		assert response["data"]["reporting_manager_name"]==getUser.reporting_manager_name
+		assert response["data"]["reporting_manager_email"]==getUser.reporting_manager_email
+	
+	#Test cases for request with invalid token		 
+	def test_list_user_byemail_with_invalid_token(self,client):
+		request=reverse("usermanagement:list-user-byemail")
+		data=json.dumps({"user_id":1,"status":fake.boolean()})
+		token=fake.uuid4()			
+		headers={"HTTP_AUTHORIZATION":token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+    
+	#Test cases for listing user request with invalid user id
+	@pytest.mark.parametrize("email",[(fake.email(domain="momenttext.com"))
+							,(fake.email(domain="momenttext.com"))
+    						,(fake.email(domain="momenttext.com"))
+          					,(fake.email(domain="momenttext.com"))
+               				,(fake.email(domain="momenttext.com"))
+                                   ])
+	def test_list_user_byemail_with_invalid_user_id(self,client,email):
+		request=reverse("usermanagement:list-user-byemail")
+		data=json.dumps({"email":email})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="No user found corresponding to the email."
+    
+    #Test case for listing user with missing parameter   
+	def test_list_user_byemail_with_invalid_user_email(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:list-user-byemail")
+		data=json.dumps({"emails":"testuser1@momenttext.com"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@pytest.mark.xfail       
+    #Test case for edit user byid with missing/invaid parameter  
+	def test_list_user_byemail_with_missing_parameter(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:list-user-byemail")
+		data=json.dumps({"company_id":2})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+  
+	#Test cases for delisting superuser
+	def test_list_user_byemail_super_user(self,client):
+		request=reverse("usermanagement:list-user-byemail")
+		data=json.dumps({"email":"su1@momenttext.com"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(id=1).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Users listed successfully."
+              
 class Test_download_file():
 	def test_download_file(self,client):
 		request=reverse("usermanagement:download-file")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
 
 	
