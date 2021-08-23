@@ -75,7 +75,7 @@ def setup_roles(setup_superusers):
 			getRole = Roles.objects.create(**role)
 
 @pytest.fixture(autouse=True)
-def setup_company(setup_superusers,setup_roles):
+def setup_company_role(setup_superusers,setup_roles):
 	company ={"name": "Administrator","created_by": 1,"updated_by": 1,}
 	company["created_by"] = Users.objects.filter(id=company["created_by"])[0]
 	company["updated_by"] = Users.objects.filter(id=company["updated_by"])[0]
@@ -92,21 +92,21 @@ def setup_company(setup_superusers,setup_roles):
 def setup_user():
 	user=[
 		{"first_name":"Test","last_name":"User1"
-			,"name":"Test User1","email":"test_user1@gmail.com"
+			,"name":"Test User1","email":"test_user1@momenttext.com"
 			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
 			,"reporting_manager_email":"Rohitkhandelwal@momenttext.com"}
 		,{"first_name":"Test","last_name":"User3"
-			,"name":"Test User3","email":"test_user3@gmail.com"
+			,"name":"Test User3","email":"test_user3@momenttext.com"
 			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
 			,"reporting_manager_id":"67890","reporting_manager_name":"Rohit Khandelwal"
 			,"reporting_manager_email":"Rohitkhandelwal@momenttext.com"}
 		,{"first_name":"Test","last_name":"User2"
-			,"name":"Test User2","email":"test_user2@gmail.com"
+			,"name":"Test User2","email":"test_user2@momenttext.com"
 			,"password":generate_passwords("Password@123"),"hashkey":uuid.uuid4().hex[:10]		
 			,"token":uuid.uuid4().hex,"designation":"Employee"
 			,"active":True,"user_verified":True
@@ -364,7 +364,9 @@ def setup_invalid_first_attempt(setup_saved_user):
 @pytest.fixture
 def setup_multiple_invalid_for_pass_reset(setup_saved_user):
 	
-	users=Users.objects.exclude(id=1)
+	users=Users.objects.exclude(email__in=["su1@momenttext.com","companyadmin@momenttext.com"
+                                        ,"testuser@momenttext.com","user@momenttext.com"
+                                        ,"projectadmin@momenttext.com"])
 	for x in range(len(users)//2):
 		getAccess=AccessManagement.objects.get(name=users[x])
 		getAccess.last_password_reset_request=(datetime.now(tz=timezone.utc)
@@ -381,7 +383,9 @@ def setup_multiple_invalid_for_pass_reset(setup_saved_user):
 @pytest.fixture
 def setup_update_password_access_counter(setup_saved_user):
 	
-	users=Users.objects.exclude(id=1)
+	users=Users.objects.exclude(email__in=["su1@momenttext.com","companyadmin@momenttext.com"
+                                        ,"testuser@momenttext.com","user@momenttext.com"
+                                        ,"projectadmin@momenttext.com"])
 	for x in range(len(users)//2):
 		getAccess=AccessManagement.objects.get(name=users[x])
 		getAccess.last_password_reset_request=(datetime.now(tz=timezone.utc)

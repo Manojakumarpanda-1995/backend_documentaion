@@ -21,8 +21,10 @@ class Test_users_models():
 			getUsers=Users.objects.create(**obj)
 			getAccess=AccessManagement.objects.create(name=getUsers)
 		
-		assert Users.objects.count()==len(setup_user)+1
-		getUsers=Users.objects.all()
+		# assert Users.objects.count()==len(setup_user)+1
+		getUsers=Users.objects.exclude(email__in=["companyadmin@momenttext.com"
+                                            ,"testuser@momenttext.com","user@momenttext.com"
+                                            ,"projectadmin@momenttext.com"])
 		for x in range(len(users)):
 			assert getUsers[0].email	== "su1@momenttext.com"
 			assert getUsers[x+1].email	== users[x]["email"]
@@ -36,7 +38,7 @@ class Test_users_models():
 			assert getUsers[x].reporting_manager_id==67890
 			assert getUsers[x].reporting_manager_name=="Rohit Khandelwal"
 			assert getUsers[x].reporting_manager_email=="Rohitkhandelwal@momenttext.com"
-			assert len(getUsers)==AccessManagement.objects.count()
+			assert Users.objects.count()==AccessManagement.objects.count()
 			
 	def test_random_user(self,setup_random_user):	 
 		users=setup_random_user
@@ -107,7 +109,9 @@ class Test_users_models():
 			getUsers=Users.objects.create(**obj)
 			getAccess=AccessManagement.objects.create(name=getUsers)
 		
-		for user in Users.objects.all(): 
+		for user in Users.objects.exclude(email__in=["projectadmin@momenttext.com"
+                                               ,"user@momenttext.com","testuser@momenttext.com"
+                                               ,"companyadmin@momenttext.com"]): 
 			getAccess=AccessManagement.objects.get(name__email=user.email)
 			assert getAccess.name.active==True
 			assert getAccess.name.user_verified==True

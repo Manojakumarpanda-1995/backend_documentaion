@@ -1,6 +1,9 @@
 import json
+from re import U
 import string
 import random
+from _pytest.monkeypatch import resolve
+from django.http import response
 import pytest
 from django import dispatch
 # from usermanagement.utils.store_activity_logs import func_store_activity_logs
@@ -25,7 +28,7 @@ fake=Faker()
 class Test_login():
 	
 	#This is for request with all valid information
-	def test_login_with_valid_data(self,client):
+	def test_login_with_valid_data(self,client,setup_company):
 		
 		request=reverse("usermanagement:loginapi")
 		data={"email":"su1@momenttext.com","password":"Password@123"}
@@ -33,6 +36,8 @@ class Test_login():
 							 ,content_type="application/json")
 		assert response.status_code==200
 		response=response.json()
+		# print("usercompany==>",UserCompanyRole.objects.filter(role_id=1))
+		# print("response==>",response)
 		assert response["statuscode"]==200
 		assert response["token"]==Users.objects.get(id=1).token
 		assert response["name"]=="backend Super User 1"
@@ -60,7 +65,7 @@ class Test_login():
 		assert response["token"]==Users.objects.get(email=email).token
 		assert response["name"]==name
 		assert response["email"]==email
-		assert response["company_id"]== 2
+		assert response["company_id"]== 8
 		assert response["role"]==role
 
 	#Test case with wrong password		
@@ -633,7 +638,8 @@ class Test_new_password():
 		request=reverse("usermanagement:new-password")
 		data=json.dumps({"email":"testuser5@momenttext.com","old_password":"Password@123"
         		,"new_passwords":"newPassword@1234"})
-		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="testuser5@momenttext.com")}
+		token=Users.objects.get(email="su1@momenttext.com").token
+		headers={"HTTP_AUTHORIZATION":token}
 		response=client.post(request,data=data,content_type="application/json",**headers)
 		assert response.status_code==200
 		response=response.json()
@@ -706,7 +712,7 @@ class Test_check_token():
 		response=client.post(request,data=data,content_type="application/json",**headers)
 		assert response.status_code==200
 		response=response.json()
-		assert response["statuscode"]==203
+		assert response["statuscode"]==200
 		assert response["isUser"]==False
        
 class Test_create_role():
@@ -1146,14 +1152,369 @@ class Test_register_access():
 		response=response.json()
 		assert response["statuscode"]==400
 		assert response["message"]=="Company with this name already registered. To claim contact with admin."
-		       
-@pytest.mark.xfail    
+		          
 class Test_edit_user():
-	def test_edit_user(self,client):
+    
+    #Test cases for edit user request with all valid data
+	def test_edit_user_with_valid_data(self,client,setup_user_for_new_password):
 		request=reverse("usermanagement:edit-user")
+		data=json.dumps({"email":"testusers1@momenttext.com"
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="testuser1@momenttext.com").token}
+		email="testuser1@momenttext.com"
+		getUser=Users.objects.get(email=email)
+		id=getUser.id
+		assert getUser.first_name=="test"
+		assert getUser.last_name=="user1"
+		assert getUser.designation is None
+		assert getUser.reporting_manager_id is None
+		assert getUser.reporting_manager_email is None
+		assert getUser.reporting_manager_name is None
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="User data updated successfully."
+		getUser=Users.objects.get(id=id)
+		assert getUser.first_name=="Test"
+		assert getUser.last_name=="Users"
+		assert getUser.designation=="Marketing"
+		assert getUser.reporting_manager_id==1
+		assert getUser.reporting_manager_email=="Ronit@momenttext.com"
+		assert getUser.reporting_manager_name =="Ronit"
 
+    #Test cases for edit user request with all users
+	@pytest.mark.parametrize("old_email,new_email,last",[
+					("testuser1@momenttext.com","test_user1@momenttext.com","user1")
+					,("testuser2@momenttext.com","test_user2@momenttext.com","user2")
+					,("testuser3@momenttext.com","test_user3@momenttext.com","user3")
+					,("testuser4@momenttext.com","test_user4@momenttext.com","user4")
+					,("testuser5@momenttext.com","test_user5@momenttext.com","user5")
+                                                   ])
+	def test_edit_user_with_all_user(self,client,old_email,
+                        new_email,last,setup_user_for_new_password):
+		request=reverse("usermanagement:edit-user")
+		data=json.dumps({"email":new_email
+                   ,"first_name":"Test","last_name":last.upper()
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":fake.email(domain="momenttext.com")
+                   ,"reporting_manager_name":fake.name()})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=old_email).token}
+		getUser=Users.objects.get(email=old_email)
+		id=getUser.id
+		assert getUser.first_name=="test"
+		assert getUser.last_name==last
+		assert getUser.designation is None
+		assert getUser.reporting_manager_id is None
+		assert getUser.reporting_manager_email is None
+		assert getUser.reporting_manager_name is None
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="User data updated successfully."
+		getUser=Users.objects.get(id=id)
+		assert getUser.email==new_email
+		assert getUser.first_name=="Test"
+		assert getUser.last_name==last.upper()
+		assert getUser.designation=="Marketing"
+		assert getUser.reporting_manager_id==1
+		assert getUser.reporting_manager_email is not None
+		assert getUser.reporting_manager_name is not None
 
+	#Test cases for request with invalid token		 
+	def test_edit_user_with_invalid_token(self,client):
+		request=reverse("usermanagement:edit-user")
+		data=json.dumps({"email":"testusers1@momenttext.com"
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		token=fake.uuid4()			
+		headers={"HTTP_AUTHORIZATION":token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+		# assert response["message"]=="Invalid Token."
+    
+	#Test cases for edit-user request with invalid email format
+	@pytest.mark.parametrize("email",[("roh#it@momenttext.com")
+							,("ran!jit@momenttext.com")
+							,("ron&it@momenttext.com")
+							,("rob*in@momenttext.com")
+							,("kart$#ik@momenttext.com")
+                                   ])
+	def test_edit_user_with_invalid_email(self,client,email):
+		request=reverse("usermanagement:edit-user")
+		data=json.dumps({"email":email
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Please try to add valid email."
+      
+class Test_edit_user_byid():
+    
+    #Test cases for edit user byid request with all valid data
+	def test_edit_user_byid_with_valid_data(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:edit-user-byid")
+		email="testuser1@momenttext.com"
+		getUser=Users.objects.get(email=email)
+		data=json.dumps({"user_id":getUser.id,"email":"testusers1@momenttext.com"
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="testuser1@momenttext.com").token}
+		id=getUser.id
+		assert getUser.first_name=="test"
+		assert getUser.last_name=="user1"
+		assert getUser.designation is None
+		assert getUser.reporting_manager_id is None
+		assert getUser.reporting_manager_email is None
+		assert getUser.reporting_manager_name is None
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="User data updated successfully."
+		getUser=Users.objects.get(id=id)
+		assert getUser.first_name=="Test"
+		assert getUser.last_name=="Users"
+		assert getUser.designation=="Marketing"
+		assert getUser.reporting_manager_id==1
+		assert getUser.reporting_manager_email=="Ronit@momenttext.com"
+		assert getUser.reporting_manager_name =="Ronit"
 
+    #Test cases for edit user byid request with all users
+	@pytest.mark.parametrize("old_email,new_email,last",[
+					("testuser1@momenttext.com","test_user1@momenttext.com","user1")
+					,("testuser2@momenttext.com","test_user2@momenttext.com","user2")
+					,("testuser3@momenttext.com","test_user3@momenttext.com","user3")
+					,("testuser4@momenttext.com","test_user4@momenttext.com","user4")
+					,("testuser5@momenttext.com","test_user5@momenttext.com","user5")
+                                                   ])
+	def test_edit_user_byid_with_all_user(self,client,old_email,
+                        new_email,last,setup_user_for_new_password):
+		request=reverse("usermanagement:edit-user-byid")
+		getUser=Users.objects.get(email=old_email)
+		id=getUser.id
+		data=json.dumps({"user_id":id,"email":new_email
+                   ,"first_name":"Test","last_name":last.upper()
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":fake.email(domain="momenttext.com")
+                   ,"reporting_manager_name":fake.name()})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=old_email).token}
+		assert getUser.first_name=="test"
+		assert getUser.last_name==last
+		assert getUser.designation is None
+		assert getUser.reporting_manager_id is None
+		assert getUser.reporting_manager_email is None
+		assert getUser.reporting_manager_name is None
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="User data updated successfully."
+		getUser=Users.objects.get(id=id)
+		assert getUser.email==new_email
+		assert getUser.first_name=="Test"
+		assert getUser.last_name==last.upper()
+		assert getUser.designation=="Marketing"
+		assert getUser.reporting_manager_id==1
+		assert getUser.reporting_manager_email is not None
+		assert getUser.reporting_manager_name is not None
+
+	#Test cases for request with invalid token		 
+	def test_edit_user_byid_with_invalid_token(self,client):
+		request=reverse("usermanagement:edit-user-byid")
+		data=json.dumps({"user_id":1,"email":"testusers1@momenttext.com"
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		token=fake.uuid4()			
+		headers={"HTTP_AUTHORIZATION":token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+    
+	#Test cases for edit-user byid request with invalid email format
+	@pytest.mark.parametrize("email",[("roh#it@momenttext.com")
+							,("ran!jit@momenttext.com")
+							,("ron&it@momenttext.com")
+							,("rob*in@momenttext.com")
+							,("kart$#ik@momenttext.com")
+                                   ])
+	def test_edit_user_byid_with_invalid_email(self,client,email):
+		request=reverse("usermanagement:edit-user-byid")
+		data=json.dumps({"user_id":2,"email":email
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Please try to add valid email."
+    
+    #Test case for edit user byid with invalid user id in parameter  
+	def test_edit_user_byid_with_invalid_user_id(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:edit-user-byid")
+		data=json.dumps({"user_id":50,"email":"test"
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="User with this detail not found."
+
+    #Test case for edit user byid with missing/invaid parameter  
+	def test_edit_user_byid_with_missing_parameter(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:edit-user-byid")
+		data=json.dumps({"email":"test"
+                   ,"first_name":"Test","last_name":"Users"
+                   ,"name":"Test Users","designation":"Marketing"
+                   ,"reporting_manager_id":1
+                   ,"reporting_manager_email":"Ronit@momenttext.com"
+                   ,"reporting_manager_name":"Ronit"})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="User with this detail not found."
+  
+class Test_deactivate_user():
+    
+    #Test cases for deactivate user request with all valid data
+	def test_deactivate_user_with_valid_data(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:deactivate-user")
+		email="testuser1@momenttext.com"
+		getUser=Users.objects.get(email=email)
+		data=json.dumps({"user_id":getUser.id,"status":False})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="testuser1@momenttext.com").token}
+		id=getUser.id
+		assert getUser.active==True
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="User deactivated successfully."
+		getUser=Users.objects.get(id=id)
+		assert getUser.active==False
+
+    #Test cases for deactivate user request with all users
+	@pytest.mark.parametrize("email",[
+					("testuser1@momenttext.com")
+					,("testuser2@momenttext.com")
+					,("testuser3@momenttext.com")
+					,("testuser4@momenttext.com")
+					,("testuser5@momenttext.com")])
+	def test_deactivate_user_with_all_user(self,client,email
+                        ,setup_user_for_new_password):
+		request=reverse("usermanagement:deactivate-user")
+		getUser=Users.objects.get(email=email)
+		id=getUser.id
+		status=fake.boolean()
+		data=json.dumps({"user_id":id,"status":status})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+		assert getUser.active==True
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="User deactivated successfully."
+		getUser=Users.objects.get(id=id)
+		assert getUser.active==status
+		
+	#Test cases for request with invalid token		 
+	def test_deactivate_user_with_invalid_token(self,client):
+		request=reverse("usermanagement:deactivate-user")
+		data=json.dumps({"user_id":1,"status":fake.boolean()})
+		token=fake.uuid4()			
+		headers={"HTTP_AUTHORIZATION":token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+    
+	#Test cases for deactivate user request with invalid user id
+	@pytest.mark.parametrize("id",[(25)
+							,(35),(45),(15),(55)
+                                   ])
+	def test_deactivate_user_with_invalid_user_id(self,client,id):
+		request=reverse("usermanagement:deactivate-user")
+		data=json.dumps({"user_id":id,"status":fake.boolean()})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="User with provided ID doesn't existed."
+    
+    #Test case for edit user byid with missing parameter   
+	def test_deactivate_user_with_invalid_user_id(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:deactivate-user")
+		data=json.dumps({"user_id":50})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+
+    #Test case for edit user byid with missing/invaid parameter  
+	def test_deactivate_user_with_missing_parameter(self,client,setup_user_for_new_password):
+		request=reverse("usermanagement:deactivate-user")
+		data=json.dumps({"user_id":2,"active":True})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+  
+	#Test cases for deactivating superuser
+	def test_deactivating_super_user(self,client):
+		request=reverse("usermanagement:deactivate-user")
+		assert Users.objects.get(id=1).active==True
+		data=json.dumps({"user_id":1,"status":False})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(id=1).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert Users.objects.get(id=1).active==False
+		assert response["statuscode"]==200
+		assert response["message"]=="User deactivated successfully."
+
+         
+class Test_list_user_byemail():
+	def test_list_user_byemail(self,client):
+		request=reverse("usermanagement:list-user-byemail")
 
 
 
@@ -1220,18 +1581,6 @@ class Test_edit_user():
 class Test_download_file():
 	def test_download_file(self,client):
 		request=reverse("usermanagement:download-file")
-@pytest.mark.xfail    
-class Test_edit_user_byid():
-	def test_edit_user_byid(self,client):
-		request=reverse("usermanagement:edit-user-byid")
-@pytest.mark.xfail    
-class Test_deactivate_user():
-	def test_deactivate_user(self,client):
-		request=reverse("usermanagement:deactivate-user")
-@pytest.mark.xfail        
-class Test_list_user_byemail():
-	def test_list_user_byemail(self,client):
-		request=reverse("usermanagement:list-user-byemail")
         
 
 	

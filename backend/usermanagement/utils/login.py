@@ -156,7 +156,7 @@ def func_login(request_data):
 							getActiveProjectUsers = ProjectUsers.objects.filter(user__id__in=allUserIds,user__isActive=True,user__role__role_name="USER", isActive=True)
 							if len(getActiveProjectUsers) == 0:
 								isEverythingOk = False
-
+					
 					if isEverythingOk:
 						logs["data"]["status_message"] = "Successful login into account."
 

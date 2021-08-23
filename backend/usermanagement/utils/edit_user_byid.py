@@ -55,8 +55,15 @@ def func_edit_user_byid(request_data, token):
 			if key not in ["Client_IP_Address", "Remote_ADDR", "Requested_URL"]:
 				apiParamsInfo[key] = value
 
+		try:
+			getUser = Users.objects.get(id=apiParamsInfo["user_id"])
+		except:
+			logs["data"]["status_message"] = "User with this detail not found."
+			response['message'] = "User with this detail not found."
+			response["statuscode"] = 400
 
-		getUser = Users.objects.get(id=apiParamsInfo["user_id"])
+			actvity_logs.insert_one(logs)
+			return response
 		if "email" in apiParamsInfo.keys():
 			getValidated=validate_email(email=apiParamsInfo["email"])
 			if getValidated==0:
