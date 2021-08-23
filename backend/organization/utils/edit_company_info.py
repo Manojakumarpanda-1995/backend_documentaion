@@ -88,7 +88,7 @@ def func_edit_company_info(request_data, token):
 						if key !="logo":
 							changed_values.append((getattr(getCompanyInfo, key), apiParamsInfo[key]))
 						setattr(getCompanyInfo, key, apiParamsInfo[key])
-      
+				getCompanyInfo.save()
 				for key, value in apiParamsInfo.items():
 					if key in [f.name for f in getCompany._meta.get_fields()]:
 						changed_values.append((getattr(getCompany, key), apiParamsInfo[key]))

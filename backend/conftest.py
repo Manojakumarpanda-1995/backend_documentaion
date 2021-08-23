@@ -75,11 +75,24 @@ def setup_roles(setup_superusers):
 			getRole = Roles.objects.create(**role)
 
 @pytest.fixture(autouse=True)
+def setup_company(setup_superusers):
+	try:
+		getSuperUser= Users.objects.filter(id=1)[0]
+		companies =[{"name": "Administrator","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name": "Google","created_by":getSuperUser,"updated_by": getSuperUser}
+				,{"name":"Gmail","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Amazon","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Tesla","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Infosys","created_by":getSuperUser,"updated_by":getSuperUser}
+				,{"name":"Tata","created_by":getSuperUser,"updated_by":getSuperUser}
+				]	
+		for company in companies:
+			getCompany = Company.objects.create(**company)
+	except Exception as e:
+		print("Exception at==>",e)
+
+@pytest.fixture(autouse=True)
 def setup_company_role(setup_superusers,setup_roles):
-	company ={"name": "Administrator","created_by": 1,"updated_by": 1,}
-	company["created_by"] = Users.objects.filter(id=company["created_by"])[0]
-	company["updated_by"] = Users.objects.filter(id=company["updated_by"])[0]
-	getCompany = Company.objects.create(**company)
 	companyRole={"user": 1,"company": 1,"role": 1,"created_by": 1,"updated_by": 1,}
 	companyRole["created_by"] = Users.objects.filter(id=companyRole["created_by"])[0]
 	companyRole["updated_by"] = Users.objects.filter(id=companyRole["updated_by"])[0]
@@ -476,7 +489,7 @@ def setup_users_roles(setup_superusers,setup_roles):
 			]
 	
 		getSuperUser= Users.objects.filter(id=1)[0]
-		company ={"name": "Google","created_by":getSuperUser,"updated_by": getSuperUser}
+		company ={"name": "Microsoft","created_by":getSuperUser,"updated_by": getSuperUser}
 		getCompany = Company.objects.create(**company)
 		roles=[2,3,4,4]
 		for x in range(len(users)):
@@ -495,22 +508,32 @@ def setup_users_roles(setup_superusers,setup_roles):
 	except Exception as e:
 		print("Exception at==>",e)
 
-@pytest.fixture(autouse=True)
-def setup_company(setup_superusers):
+@pytest.fixture()
+def setup_test_company(setup_superusers):
 	try:
 		getSuperUser= Users.objects.filter(id=1)[0]
-		companies =[{"name": "Google","created_by":getSuperUser,"updated_by": getSuperUser}
-				,{"name":"Gmail","created_by":getSuperUser,"updated_by":getSuperUser}
-				,{"name":"Amazon","created_by":getSuperUser,"updated_by":getSuperUser}
-				,{"name":"Tesla","created_by":getSuperUser,"updated_by":getSuperUser}
-				,{"name":"Infosys","created_by":getSuperUser,"updated_by":getSuperUser}
-				,{"name":"Tata","created_by":getSuperUser,"updated_by":getSuperUser}
+		companies =[{"name": "Momenttext","address1":fake.address(),"active":False,"city":fake.city()
+				,"state":fake.state(),"country":fake.country(),"state_pin_code":fake.postcode()
+				,"partner_name":fake.name()}
+				,{"name":"Allen Solly","address1":fake.address(),"active":True,"city":fake.city()
+				,"state":fake.state(),"country":fake.country(),"state_pin_code":fake.postcode()
+				,"partner_name":fake.name()}
+				,{"name":"Honda","address1":fake.address(),"active":False,"city":fake.city()
+				,"state":fake.state(),"country":fake.country(),"state_pin_code":fake.postcode()
+				,"partner_name":fake.name()}
+				,{"name":"Mahindra","address1":fake.address(),"active":True,"city":fake.city()
+				,"state":fake.state(),"country":fake.country(),"state_pin_code":fake.postcode()
+				,"partner_name":fake.name()}
+				,{"name":"Peter England","address1":fake.address(),"active":False,"city":fake.city()
+				,"state":fake.state(),"country":fake.country(),"state_pin_code":fake.postcode()
+				,"partner_name":fake.name()}
 				]	
 		for company in companies:
+			company["created_by"]=getSuperUser
+			company["updated_by"]=getSuperUser
 			getCompany = Company.objects.create(**company)
 	except Exception as e:
 		print("Exception at==>",e)
-
 
 
 
