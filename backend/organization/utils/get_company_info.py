@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 import datetime
-
+media_url=getattr(settings,'MEDIA_URL')
 from organization.models import Company, CompanyInfo, UserCompanyRole
 
 actvity_logs = getattr(settings, "ACTIVITY_LOGS_DB", None)
@@ -71,14 +71,21 @@ def func_get_company_info(request_data, token):
 			# getCompanyUsers=UserCompanyRole.objects.filter(company=getCompany[0]
             #                                       ,role__role_name="COMPANY-ADMIN"
             #                                       , isActive=True)
-
 			if len(getCompany) > 0 and len(getCompanyInfo):
+				folder_name=(getCompany[0].name.strip(' ')).replace(' ','_')
+				filename=str(getCompanyInfo[0].logo).split('/')[1]
+				file_path = os.path.join(media_url,folder_name,filename)
 				getCompanyData = getCompanyInfo.values()[0]
 				getCompanyInfo=getCompanyInfo[0]
 				getCompanyData["created_at"] = getCompanyInfo.created_at.strftime("%d-%m-%Y")
 				getCompanyData["updated_at"] = getCompanyInfo.updated_at.strftime("%d-%m-%Y")
+				getCompanyData["logo"] =file_path
 				getCompanyData["company_id"] = getCompanyInfo.company.id
 				getCompanyData["name"] = getCompanyInfo.company.name
+				getCompanyData["city"] = getCompanyInfo.company.city
+				getCompanyData["state"] = getCompanyInfo.company.state
+				getCompanyData["country"] = getCompanyInfo.company.country
+				getCompanyData["state_pin_code"] = getCompanyInfo.company.state_pin_code
 				response["data"] = getCompanyData
 				logs["data"]["data_fields"] = [comapnyInfo["client_id"]]
 				logs["data"]["status_message"] = "Company fetched successfully."

@@ -88,6 +88,18 @@ def setup_company(setup_superusers):
 				]	
 		for company in companies:
 			getCompany = Company.objects.create(**company)
+			getCompanyInfo,created=CompanyInfo.objects.get_or_create(company=getCompany
+										,created_by=Users.objects.get(id=1)
+										,updated_by=Users.objects.get(id=1))
+			getCompanyInfo.logo = fake.image_url()
+			getCompanyInfo.corporate_type ="Health Insurance"
+			getCompanyInfo.number_of_emploies=fake.building_number()
+			getCompanyInfo.type="Health"
+			getCompanyInfo.links =fake.url()
+			getCompanyInfo.about=fake.text(max_nb_chars=500)
+			getCompanyInfo.active=True
+			getCompanyInfo.save()
+
 	except Exception as e:
 		print("Exception at==>",e)
 
@@ -508,7 +520,7 @@ def setup_users_roles(setup_superusers,setup_roles):
 	except Exception as e:
 		print("Exception at==>",e)
 
-@pytest.fixture()
+@pytest.fixture
 def setup_test_company(setup_superusers):
 	try:
 		getSuperUser= Users.objects.filter(id=1)[0]
@@ -532,14 +544,85 @@ def setup_test_company(setup_superusers):
 			company["created_by"]=getSuperUser
 			company["updated_by"]=getSuperUser
 			getCompany = Company.objects.create(**company)
+		return companies
 	except Exception as e:
 		print("Exception at==>",e)
 
+  
+@pytest.fixture
+def setup_company_info(setup_test_company):
+	getCompanies=setup_test_company
+	companyinfo=[]
+	for company in getCompanies:
+		getCompany=Company.objects.get(name=company["name"])
+		getCompanyInfo,created=CompanyInfo.objects.get_or_create(company=getCompany
+										,created_by=Users.objects.get(id=1)
+										,updated_by=Users.objects.get(id=1))
+		getCompanyInfo.logo = fake.image_url()
+		getCompanyInfo.corporate_type ="Health Insurance"
+		getCompanyInfo.number_of_emploies=fake.building_number()
+		getCompanyInfo.type="Health"
+		getCompanyInfo.links =fake.url()
+		getCompanyInfo.about=fake.text(max_nb_chars=500)
+		status=fake.boolean()
+		getCompanyInfo.active=status
+		getCompanyInfo.save()
+		companyinfo.append({"company":company["name"],"status":status})
 
+	return companyinfo
 
+@pytest.fixture    
+def setup_usercompany_role(setup_random_user):
+	try:
+		users=setup_random_user
 
+		#To list all user
+		companies=[fake.company() for x in range(4)]
+		for company in companies:
+			getCompany=Company.objects.create(name=company,created_by=Users.objects.get(id=1)
+												,updated_by=Users.objects.get(id=1))
+		
+		#To list all company
+		company1=Company.objects.get(name=companies[0])
+		company2=Company.objects.get(name=companies[1])
+		company3=Company.objects.get(name=companies[2])
+		company4=Company.objects.get(name=companies[3])
+	
+		for user in users:
+			getUsers=Users.objects.create(**user)
 
+		#To list all users
+		user1=Users.objects.get(email="testuser1@momenttext.com")
+		user2=Users.objects.get(email="testuser2@momenttext.com")
+		user3=Users.objects.get(email="testuser3@momenttext.com")
+		user4=Users.objects.get(email="testuser4@momenttext.com")
+		user5=Users.objects.get(email="testuser5@momenttext.com")
+		user6=Users.objects.get(email="testuser6@momenttext.com")
+		company_admin=Roles.objects.get(id=2)
+		project_admin=Roles.objects.get(id=3)
+		user=Roles.objects.get(id=4)
+		#Users 1 with company 1,2,3 all user
+		getUserCompanyRoles=[{"user":user1,"company":company2,"role":company_admin}
+							,{"user":user1,"company":company3,"role":company_admin}
+							,{"user":user2,"company":company2,"role":project_admin}
+							,{"user":user2,"company":company3,"role":project_admin}
+							,{"user":user3,"company":company1,"role":project_admin}
+							,{"user":user3,"company":company3,"role":user}
+							,{"user":user4,"company":company4,"role":company_admin}
+							,{"user":user5,"company":company4,"role":user}
+							,{"user":user6,"company":company1,"role":user}
+							,{"user":user6,"company":company2,"role":user}
+							,{"user":user6,"company":company3,"role":user}
+							,{"user":user6,"company":company4,"role":user}
+							]
+		for obj in getUserCompanyRoles:
+			obj["created_by"]=Users.objects.get(id=1)
+			obj["updated_by"]=Users.objects.get(id=1)
+			getUserCompanyRole=UserCompanyRole.objects.create(**obj)
 
+		return companies
+	except Exception as e:
+		print("Exception at==>",e)
 
 
 

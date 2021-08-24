@@ -219,8 +219,10 @@ STATICFILES_DIRS=[os.path.join(BASE_DIR,"static")]
 VENV_PATH = os.path.dirname(BASE_DIR)
 STATIC_ROOT = os.path.join(VENV_PATH, 'static')
 
-MEDIA_URL = '/media_files/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media_files')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+LOGIN_REDIRECT_URL = '/'
+MEDIA_URL = '/static/media_files/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media_files')
 
 EMAIL_IP = "smtp.gmail.com"
 EMAIL = "noreply@momenttext.com"

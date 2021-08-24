@@ -8,7 +8,7 @@ from usermanagement.models import Roles, Users
 
 
 def get_file_path(instance, filename):
-	s = instance.company.name
+	s = (instance.company.name.strip(' ')).replace(' ','_')
 	return os.path.join(str(s), filename)
 
 class Company(models.Model):
