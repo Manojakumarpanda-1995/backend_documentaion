@@ -67,31 +67,45 @@ def func_get_company_info(request_data, token):
 
 		if isAuthorized:
 			getCompany = Company.objects.filter(id=comapnyInfo["client_id"])
+			if len(getCompany)==0:
+				logs["data"]["data_fields"] = [comapnyInfo["client_id"]]
+				logs["data"]["status_message"] = 'No Company found in database.'
+				response['message'] = 'No Company Information found in database.'
+				response["statuscode"] = 400
+				actvity_logs.insert_one(logs)
+				return response
+
 			getCompanyInfo=CompanyInfo.objects.filter(company=getCompany[0],active=True)
 			# getCompanyUsers=UserCompanyRole.objects.filter(company=getCompany[0]
             #                                       ,role__role_name="COMPANY-ADMIN"
             #                                       , isActive=True)
-			if len(getCompany) > 0 and len(getCompanyInfo):
-				folder_name=(getCompany[0].name.strip(' ')).replace(' ','_')
-				filename=str(getCompanyInfo[0].logo).split('/')[1]
-				file_path = os.path.join(media_url,folder_name,filename)
-				getCompanyData = getCompanyInfo.values()[0]
-				getCompanyInfo=getCompanyInfo[0]
-				getCompanyData["created_at"] = getCompanyInfo.created_at.strftime("%d-%m-%Y")
-				getCompanyData["updated_at"] = getCompanyInfo.updated_at.strftime("%d-%m-%Y")
-				getCompanyData["logo"] =file_path
-				getCompanyData["company_id"] = getCompanyInfo.company.id
-				getCompanyData["name"] = getCompanyInfo.company.name
-				getCompanyData["city"] = getCompanyInfo.company.city
-				getCompanyData["state"] = getCompanyInfo.company.state
-				getCompanyData["country"] = getCompanyInfo.company.country
-				getCompanyData["state_pin_code"] = getCompanyInfo.company.state_pin_code
-				response["data"] = getCompanyData
-				logs["data"]["data_fields"] = [comapnyInfo["client_id"]]
-				logs["data"]["status_message"] = "Company fetched successfully."
-				response['message'] = 'Company fetched successfully.'
-				response["statuscode"] = 200
-			elif len(getCompany) > 0:
+			try:
+				if len(getCompany) > 0 and len(getCompanyInfo):
+					folder_name=(getCompany[0].name.strip(' ')).replace(' ','_')
+					filename=str(getCompanyInfo[0].logo).split('/')[1]
+					file_path = os.path.join(media_url,folder_name,filename)
+					getCompanyData = getCompanyInfo.values()[0]
+					getCompanyInfo=getCompanyInfo[0]
+					getCompanyData["created_at"] = getCompanyInfo.created_at.strftime("%d-%m-%Y")
+					getCompanyData["updated_at"] = getCompanyInfo.updated_at.strftime("%d-%m-%Y")
+					getCompanyData["logo"] =file_path
+					getCompanyData["company_id"] = getCompanyInfo.company.id
+					getCompanyData["name"] = getCompanyInfo.company.name
+					getCompanyData["city"] = getCompanyInfo.company.city
+					getCompanyData["state"] = getCompanyInfo.company.state
+					getCompanyData["country"] = getCompanyInfo.company.country
+					getCompanyData["state_pin_code"] = getCompanyInfo.company.state_pin_code
+					response["data"] = getCompanyData
+					logs["data"]["data_fields"] = [comapnyInfo["client_id"]]
+					logs["data"]["status_message"] = "Company Information fetched successfully."
+					response['message'] = 'Company Information fetched successfully.'
+					response["statuscode"] = 200
+				else:
+					logs["data"]["data_fields"] = [comapnyInfo["client_id"]]
+					logs["data"]["status_message"] = 'No Company Information found in database.'
+					response['message'] = 'No Company Information found in database.'
+					response["statuscode"] = 400
+			except:
 				getCompanyData = getCompany.values()[0]
 				getCompanyData["created_at"] = getCompany[0].created_at.strftime("%d-%m-%Y")
 				getCompanyData["updated_at"] = getCompany[0].updated_at.strftime("%d-%m-%Y")
@@ -103,11 +117,6 @@ def func_get_company_info(request_data, token):
 				response['message'] = 'Company Information fetched successfully.'
 				response["statuscode"] = 200
 
-			else:
-				logs["data"]["data_fields"] = [comapnyInfo["client_id"]]
-				logs["data"]["status_message"] = 'No Company Information found in database.'
-				response['message'] = 'No Company Information found in database.'
-				response["statuscode"] = 400
 		else:
 			logs["data"]["data_fields"] = [comapnyInfo["client_id"]]
 			logs["data"]["status_message"] = 'Only SuperUser can fetch the Company Information.'

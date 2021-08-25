@@ -14,7 +14,7 @@ class Test_create_company():
 		request=reverse("organization:create-company")
 		getUsers=Users.objects.get(email="su1@momenttext.com")
 		headers={"HTTP_AUTHORIZATION":getUsers.token}
-		data=json.dumps({"name": "Flipkart"
+		data=json.dumps({"name": "Flipkart","country":fake.country()
 			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
 			,"state_pin_code":fake.postalcode()})
 		response=client.post(request,data=data,content_type="application/json",**headers)
@@ -27,7 +27,7 @@ class Test_create_company():
 	#Test case for creating a company with invalid token.
 	def test_create_company_with_invalid_token(self,client):
 		request=reverse("organization:create-company")
-		data=json.dumps({"name": fake.company()
+		data=json.dumps({"name": fake.company(),"country":fake.country()
                   ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
                   ,"state_pin_code":fake.postalcode()})
 		headers={"HTTP_AUTHORIZATION":fake.uuid4()}
@@ -39,7 +39,7 @@ class Test_create_company():
 	#Test case for creating a company with missing/invalid parameter.
 	def test_create_company_with_invalid_parameter(self,client):
 		request=reverse("organization:create-company")
-		data=json.dumps({"names": fake.company()
+		data=json.dumps({"names": fake.company(),"country":fake.country()
                   ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
                   ,"state_pin_code":fake.postalcode()})
 		getUsers=Users.objects.get(email="su1@momenttext.com")
@@ -64,7 +64,7 @@ class Test_create_company():
                                    ])
 	def test_create_company_without_authorization(self,client,email):
 		request=reverse("organization:create-company")
-		data=json.dumps({"name": fake.company()
+		data=json.dumps({"name": fake.company(),"country":fake.country()
                   ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
                   ,"state_pin_code":fake.postalcode()})
 		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
@@ -80,7 +80,7 @@ class Test_create_company():
                                    ])
 	def test_create_company_with_existing_company(self,client,company_name):
 		request=reverse("organization:create-company")
-		data=json.dumps({"name": company_name
+		data=json.dumps({"name": company_name,"country":fake.country()
                   ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
                   ,"state_pin_code":fake.postalcode()})
 		getUsers=Users.objects.get(email="su1@momenttext.com")
@@ -170,7 +170,7 @@ class Test_get_company():
 		assert response.status_code==200
 		response=response.json()
 		assert response["statuscode"]==500
-		data=json.dumps({"city":fake.city()})
+		data=json.dumps({"city":fake.company()})
 		headers={"HTTP_AUTHORIZATION":getUsers.token}
 		response=client.post(request,data=data,content_type="application/json",**headers)
 		assert response.status_code==200
@@ -497,35 +497,423 @@ class Test_list_company_byemail():
 		response=client.post(request,data=data,content_type="application/json",**headers)
 		assert response.status_code==200
 		response=response.json()
-		print("Responses==>",response)
-		# getUserCompanyRole=UserCompanyRole.objects.filter(user__email=email,role__role_name=role)
-		# response["statuscode"]==200
-		# assert len(response["data"])==len(getUserCompanyRole)
-		# for x in range(len(getUserCompanyRole)):
-		# 	assert response["data"][x]["id"]==getUserCompanyRole[x].company.id
-		# 	assert response["data"][x]["name"]==getUserCompanyRole[x].company.name
-		# 	assert response["data"][x]["role"]==role
+		getUserCompanyRole= UserCompanyRole.objects.filter(user__email=email,
+										# company=company.company,
+										user__active=True,
+										company__active=True, 
+										role__active=True, 
+										isActive=True)
+		response["statuscode"]==200
+		assert len(response["data"])==len(getUserCompanyRole)
+		for x in range(len(getUserCompanyRole)):
+			assert response["data"][x]["id"]==getUserCompanyRole[x].company.id
+			assert response["data"][x]["name"]==getUserCompanyRole[x].company.name
+			assert response["data"][x]["role"]==getUserCompanyRole[x].role.role_name
 		response["message"]=="List companies successfull."
-
-
- 
-@pytest.mark.xfail				
+ 				
 class Test_edit_company():
-	def test_edit_company(self,*args, **kwargs):
+    
+    #Test case for editing a company with all valid data.
+	def test_edit_company_with_valid_data(self,client):
 		request=reverse("organization:edit-company")
-		headers={"HTTP_AUTHORIZATION":""}
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getCompany=Company.objects.get(id=2)
+		assert getCompany.name=="Google"
+		assert getCompany.city is None
+		assert getCompany.address1 is None
+		assert getCompany.state is None
+		assert getCompany.state_pin_code is None
+		data={"client_id":2,"name": "Flipkart","country":fake.country(),"partner_name":fake.name()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()}
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Company data updated successfully."
+		getCompany=Company.objects.get(id=2)
+		assert getCompany.name=="Flipkart"
+		assert getCompany.city==data["city"]
+		assert getCompany.address1==data["address1"]
+		assert getCompany.state==data["state"]
+		assert getCompany.state_pin_code==data["state_pin_code"]
+		assert getCompany.country==data["country"]
+		assert getCompany.partner_name==data["partner_name"]
 
-@pytest.mark.xfail				
+	#Test case for editing a company with invalid token.
+	def test_edit_company_with_invalid_token(self,client):
+		request=reverse("organization:edit-company")
+		data=json.dumps({"client_id":2,"name": "Flipkart","country":fake.country()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()})
+		headers={"HTTP_AUTHORIZATION":fake.uuid4()}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+      
+	#Test case for creating a company with missing/invalid parameter.
+	def test_edit_company_with_invalid_parameter(self,client):
+		request=reverse("organization:edit-company")
+		data=json.dumps({"client_ids":2,"name": "Flipkart","country":fake.country()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()})
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+		data=json.dumps({"address1":fake.address(),"city":fake.city(),"state":fake.state()
+                  ,"state_pin_code":fake.postalcode()})
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+      
+	#Test case for editing a company without user authorization.
+	@pytest.mark.parametrize("email",[("projectadmin@momenttext.com")
+                                   ,("testuser@momenttext.com")
+                                   ,("user@momenttext.com")
+                                   ])
+	def test_edit_company_without_authorization(self,client,email):
+		request=reverse("organization:edit-company")
+		data=json.dumps({"client_id":2,"name": "Flipkart","country":fake.country()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="You are not authorized to edit company details."
+      
+	#Test case for editing a company with invalid client_id.
+	@pytest.mark.parametrize("client_id",[(30),(40),(50),(60),(15),(70)])
+	def test_edit_company_with_existing_company(self,client,client_id):
+		request=reverse("organization:edit-company")
+		data=json.dumps({"client_id":client_id
+                  ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+                  ,"state_pin_code":fake.postalcode()})
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Company with provided ID doesn't exist."
+    
+	#Test case for editing a company with user of different companies 
+	@pytest.mark.parametrize("client_id",[(3),(4),(5),(6),(1),(7)])
+	def test_edit_company(self,client,client_id):
+		request=reverse("organization:edit-company")
+		getUsers=Users.objects.get(email="companyadmin@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		data={"client_id":client_id,"name":fake.company(),"partner_name":fake.name()
+                  ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+                  ,"state_pin_code":fake.postalcode(),"country":fake.country()}
+		getCompany=Company.objects.get(id=client_id)
+		assert getCompany.state_pin_code is None
+		assert getCompany.name is not None
+		assert getCompany.city is None
+		assert getCompany.address1 is None
+		assert getCompany.state is None
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Company data updated successfully."
+		getCompany=Company.objects.get(id=client_id)
+		assert getCompany.name==data["name"]
+		assert getCompany.city==data["city"]
+		assert getCompany.address1==data["address1"]
+		assert getCompany.state==data["state"]
+		assert getCompany.state_pin_code==data["state_pin_code"]
+		assert getCompany.country==data["country"]
+		assert getCompany.partner_name==data["partner_name"]
+  				
 class Test_get_company_info():
-	def test_get_company_info(self,*args, **kwargs):
+    
+     #Test case for getting company info data with all valid parameters
+	def test_get_company_info_with_valid_data(self,client):
 		request=reverse("organization:get-company-info")
-		headers={"HTTP_AUTHORIZATION":""}
-
-@pytest.mark.xfail				
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		data=json.dumps({"client_id":2})
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Company Information fetched successfully."
+		getCompany=Company.objects.get(id=2)
+		getCompanyInfo=CompanyInfo.objects.get(company=getCompany)
+		assert len(Company.objects.all())==CompanyInfo.objects.count()
+		assert response["data"]["id"]==getCompanyInfo.id
+		assert response["data"]["company_id"]==getCompany.id
+		assert response["data"]["logo"] is not None
+		assert response["data"]["corporate_type"]==getCompanyInfo.corporate_type
+		assert response["data"]["number_of_emploies"]==getCompanyInfo.number_of_emploies
+		assert response["data"]["type"]==getCompanyInfo.type
+		assert response["data"]["links"]==getCompanyInfo.links
+		assert response["data"]["about"]==getCompanyInfo.about
+		assert len(response["data"]["about"])<=500
+		assert response["data"]["active"]==True
+		assert response["data"]["created_at"]==getCompanyInfo.created_at.strftime("%d-%m-%Y")
+		assert response["data"]["updated_at"]==getCompanyInfo.updated_at.strftime("%d-%m-%Y")
+		assert response["data"]["created_by_id"]==1
+		assert response["data"]["updated_by_id"]==1
+		assert response["data"]["name"]==getCompany.name
+		assert response["data"]["city"] is None
+		assert response["data"]["state"] is None
+		assert response["data"]["country"] is None
+		assert response["data"]["state_pin_code"] is None
+  
+    #Test case for getting company info data with invalid client_id
+	@pytest.mark.parametrize("client_id",[(15),(25),(35),(45),(55)])
+	def test_get_company_info_with_invalid_client_id(self,client,client_id):
+		request=reverse("organization:get-company-info")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		data=json.dumps({"client_id":client_id})
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="No Company Information found in database."
+  
+    #Test case for getting company info data with all company
+	@pytest.mark.parametrize("company,client_id",[("Google",2)
+				,("Gmail",3),("Amazon",4),("Tesla",5),("Infosys",6),("Tata",7)]) 			
+	def test_get_company_info_with_all_company(self,client,company,client_id):
+		request=reverse("organization:get-company-info")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		data=json.dumps({"client_id":client_id})
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Company Information fetched successfully."
+		getCompany=Company.objects.get(id=client_id)
+		getCompanyInfo=CompanyInfo.objects.get(company=getCompany)
+		assert len(Company.objects.all())==CompanyInfo.objects.count()
+		assert response["data"]["id"]==getCompanyInfo.id
+		assert response["data"]["company_id"]==getCompany.id
+		assert response["data"]["logo"] is not None
+		assert response["data"]["corporate_type"]==getCompanyInfo.corporate_type
+		assert response["data"]["number_of_emploies"]==getCompanyInfo.number_of_emploies
+		assert response["data"]["type"]==getCompanyInfo.type
+		assert response["data"]["links"]==getCompanyInfo.links
+		assert response["data"]["about"]==getCompanyInfo.about
+		assert len(response["data"]["about"])<=500
+		assert response["data"]["active"]==True
+		assert response["data"]["created_at"]==getCompanyInfo.created_at.strftime("%d-%m-%Y")
+		assert response["data"]["updated_at"]==getCompanyInfo.updated_at.strftime("%d-%m-%Y")
+		assert response["data"]["created_by_id"]==1
+		assert response["data"]["updated_by_id"]==1
+		assert response["data"]["name"]==company
+		assert response["data"]["city"] is None
+		assert response["data"]["state"] is None
+		assert response["data"]["country"] is None
+		assert response["data"]["state_pin_code"] is None
+  
+	#Test case for get company info with missing/invalid parameter.
+	def test_get_company_info_with_invalid_parameter(self,client):
+		request=reverse("organization:get-company-info")
+		data=json.dumps({"client_ids":2})
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+		data=json.dumps({"name":fake.company()})
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+  
+	#Test case for get company info with invalid token.
+	def test_get_company_info_with_invalid_token(self,client):
+		request=reverse("organization:get-company-info")
+		data=json.dumps({"client_id":3})
+		headers={"HTTP_AUTHORIZATION":fake.uuid4()}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+    
+	#Test case for get company info without user authorization.
+	@pytest.mark.parametrize("email",[("projectadmin@momenttext.com")
+                                   ,("testuser@momenttext.com")
+                                   ,("user@momenttext.com")
+                                   ])
+	def test_get_company_info_without_authorization(self,client,email):
+		request=reverse("organization:get-company-info")
+		data=json.dumps({"client_id":2})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Only SuperUser can fetch the Company Information."
+    
+	#Test case for the get company info where only company data is there but not extra info
+	@pytest.mark.parametrize("email",[("companyadmin@momenttext.com")])
+	def test_get_company_info(self,client,email,setup_test_company):
+		companies=setup_test_company
+		request=reverse("organization:get-company-info")
+		for company in companies:
+			getCompany=Company.objects.get(name=company["name"])
+			data=json.dumps({"client_id":getCompany.id})
+			headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+			response=client.post(request,data=data,content_type="application/json",**headers)
+			assert response.status_code==200
+			response=response.json()
+			assert response["statuscode"]==200
+			assert response["message"]=="Company Information fetched successfully."
+			assert response["data"]["id"]==getCompany.id
+			assert response["data"]["name"]==company["name"]
+			assert response["data"]["address1"]==company["address1"]
+			assert response["data"]["city"]==company["city"]
+			assert response["data"]["state"]==company["state"]
+			assert response["data"]["country"]==company["country"]
+			assert response["data"]["partner_name"]==company["partner_name"]
+			assert response["data"]["state_pin_code"]==company["state_pin_code"]
+			assert response["data"]["active"]==company["active"]
+			assert response["data"]["created_by_id"]==1
+			assert response["data"]["updated_by_id"]==1
+				
 class Test_edit_company_info():
-	def test_edit_company_info(self,*args, **kwargs):
+    
+     #Test case for editing a company information with all valid data.
+	def test_edit_company_info_with_valid_data(self,client):
 		request=reverse("organization:edit-company-info")
-		headers={"HTTP_AUTHORIZATION":""}
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getCompany=Company.objects.get(id=2)
+		assert getCompany.name=="Google"
+		assert getCompany.city is None
+		assert getCompany.address1 is None
+		assert getCompany.state is None
+		assert getCompany.state_pin_code is None
+		data={"client_id":2,"name": "Flipkart","country":fake.country(),"partner_name":fake.name()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()}
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Company data updated successfully."
+		getCompany=Company.objects.get(id=2)
+		assert getCompany.name=="Flipkart"
+		assert getCompany.city==data["city"]
+		assert getCompany.address1==data["address1"]
+		assert getCompany.state==data["state"]
+		assert getCompany.state_pin_code==data["state_pin_code"]
+		assert getCompany.country==data["country"]
+		assert getCompany.partner_name==data["partner_name"]
+
+	#Test case for editing a company information with invalid token.
+	def test_edit_company_info_with_invalid_token(self,client):
+		request=reverse("organization:edit-company-info")
+		data=json.dumps({"client_id":2,"name": "Flipkart","country":fake.country()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()})
+		headers={"HTTP_AUTHORIZATION":fake.uuid4()}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+      
+	#Test case for creating a company information with missing/invalid parameter.
+	def test_edit_company_info_with_invalid_parameter(self,client):
+		request=reverse("organization:edit-company-info")
+		data=json.dumps({"client_ids":2,"name": "Flipkart","country":fake.country()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()})
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+		data=json.dumps({"address1":fake.address(),"city":fake.city(),"state":fake.state()
+                  ,"state_pin_code":fake.postalcode()})
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+      
+	#Test case for editing a company information without user authorization.
+	@pytest.mark.parametrize("email",[("projectadmin@momenttext.com")
+                                   ,("testuser@momenttext.com")
+                                   ,("user@momenttext.com")
+                                   ])
+	def test_edit_company_info_without_authorization(self,client,email):
+		request=reverse("organization:edit-company-info")
+		data=json.dumps({"client_id":2,"name": "Flipkart","country":fake.country()
+			,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+			,"state_pin_code":fake.postalcode()})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="You are not authorized to edit company details."
+      
+	#Test case for editing a company information with invalid client_id.
+	@pytest.mark.parametrize("client_id",[(30),(40),(50),(60),(15),(70)])
+	def test_edit_company_info_with_existing_company(self,client,client_id):
+		request=reverse("organization:edit-company-info")
+		data=json.dumps({"client_id":client_id
+                  ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+                  ,"state_pin_code":fake.postalcode()})
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Company with provided ID doesn't exist."
+    
+	#Test case for editing a company information with user of different companies 
+	@pytest.mark.parametrize("client_id",[(3),(4),(5),(6),(1),(7)])
+	def test_edit_company_info(self,client,client_id):
+		request=reverse("organization:edit-company-info")
+		getUsers=Users.objects.get(email="companyadmin@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		data={"client_id":client_id,"name":fake.company(),"partner_name":fake.name()
+                  ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+                  ,"state_pin_code":fake.postalcode(),"country":fake.country()}
+		getCompany=Company.objects.get(id=client_id)
+		assert getCompany.state_pin_code is None
+		assert getCompany.name is not None
+		assert getCompany.city is None
+		assert getCompany.address1 is None
+		assert getCompany.state is None
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Company data updated successfully."
+		getCompany=Company.objects.get(id=client_id)
+		assert getCompany.name==data["name"]
+		assert getCompany.city==data["city"]
+		assert getCompany.address1==data["address1"]
+		assert getCompany.state==data["state"]
+		assert getCompany.state_pin_code==data["state_pin_code"]
+		assert getCompany.country==data["country"]
+		assert getCompany.partner_name==data["partner_name"]
+  	
+	def test_edit_company_info(self,client,setup_test_company):
+		companies=setup_test_company
+		request=reverse("organization:edit-company-info")
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com")}
 
 @pytest.mark.xfail				
 class Test_list_users():
