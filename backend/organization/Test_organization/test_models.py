@@ -148,4 +148,8 @@ class Test_UserCompanyRole():
                                                   	,role__role_name=role.upper())
 		assert getUserCompanyRole.company.name==company[id-1]
 		assert getUserCompanyRole.role.role_name==role.upper()
+		assert getUserCompanyRole.company.active==True
+		assert getUserCompanyRole.company.address1 is None
+		assert getUserCompanyRole.company.address2 is None
+		assert getUserCompanyRole.company.city is None
 		assert getUserCompanyRole.user.active==Users.objects.get(email=user).active

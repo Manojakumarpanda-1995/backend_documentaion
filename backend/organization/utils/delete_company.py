@@ -71,16 +71,21 @@ def func_delete_company(request_data, token):
 				getCompany.save()
 
 				logs["data"]["data_fields"] = [getCompany.id]
-				logs["data"]["status_message"] = "Company deleted successfully."
+				if apiParamsInfo["status"]:
+					logs["data"]["status_message"] = "Company activated successfully."
+					response['message'] = "Company activated successfully."
+				else:
+					logs["data"]["status_message"] = "Company deleted successfully."
+					response['message'] = "Company deleted successfully."
 
-				response['message'] = "Company deleted successfully."
 				response["statuscode"] = 200
 			
 			else:
 				logs["data"]["data_fields"] = [apiParamsInfo["client_id"]]
-				logs["data"]["status_message"] = "Company with provided ID doesn't exist."
+				if apiParamsInfo["status"]:
+					logs["data"]["status_message"] = "Company with provided ID doesn't exist."
 
-				response['message'] = "Company with provided ID doesn't exist."
+					response['message'] = "Company with provided ID doesn't exist."
 				response["statuscode"] = 400
 		else:
 			logs["data"]["status_message"] = "You are not authorized to delete company."

@@ -547,8 +547,7 @@ def setup_test_company(setup_superusers):
 		return companies
 	except Exception as e:
 		print("Exception at==>",e)
-
-  
+ 
 @pytest.fixture
 def setup_company_info(setup_test_company):
 	getCompanies=setup_test_company
@@ -624,6 +623,18 @@ def setup_usercompany_role(setup_random_user):
 	except Exception as e:
 		print("Exception at==>",e)
 
+@pytest.fixture
+def setup_list_company():
+	
+	getCompanies=Company.objects.exclude(name__in=["Administrator","Microsoft"])
+	getRole=Roles.objects.get(id=2)
+	getUsers=Users.objects.get(email="companyadmin@momenttext.com")
+	for company in getCompanies:
+		getUserCompanyRole=UserCompanyRole.objects.create(company=company
+                                ,created_by_id=1
+                                ,updated_by_id=1
+								,role=getRole
+								,user=getUsers)
 
 
 
