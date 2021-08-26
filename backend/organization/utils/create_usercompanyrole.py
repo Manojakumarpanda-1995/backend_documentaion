@@ -274,24 +274,24 @@ def func_create_usercompanyrole(request_data, token):
 
 						# Send Email to new User
 						getAccess = AccessManagement.objects.get(name=getUser)
-						if getAccess.last_login_attempt is None:
-							if getRole.role_name != "USER" and isNew==False:
-								send_email.delay(str({"email": getUser.email,
-													"subject": "New Registration",
-													"template_name": "generate_passwords", 
-													# "variables": [decryption(getUser.password)],
-													"variables": [password],
-													"email_type": "plain"
-													}))
-							elif getRole.role_name=='USER' and isNew==False:
-								send_email.delay(str({"email": getUser.email,
-													"subject": "New Registration",
-													# "template_name": "generate_passwords_user", 
-													"template_name": "generate_passwords", 
-													# "variables": [decryption(getUser.password)],
-													"variables": [password],
-													"email_type": "plain"
-													}))
+						# if getAccess.last_login_attempt is None:
+						# 	if getRole.role_name != "USER" and isNew==False:
+						# 		send_email.delay(str({"email": getUser.email,
+						# 							"subject": "New Registration",
+						# 							"template_name": "generate_passwords", 
+						# 							# "variables": [decryption(getUser.password)],
+						# 							"variables": [password],
+						# 							"email_type": "plain"
+						# 							}))
+						# 	elif getRole.role_name=='USER' and isNew==False:
+						# 		send_email.delay(str({"email": getUser.email,
+						# 							"subject": "New Registration",
+						# 							# "template_name": "generate_passwords_user", 
+						# 							"template_name": "generate_passwords", 
+						# 							# "variables": [decryption(getUser.password)],
+						# 							"variables": [password],
+						# 							"email_type": "plain"
+						# 							}))
 						
 						# else:
 						# 	getUserCompany = getUserCompany[0]

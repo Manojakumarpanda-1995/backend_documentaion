@@ -1,5 +1,7 @@
+from conftest import setup_create_usercompanyrole_with_existing_companyrole
 import json
 import pytest
+import random
 from faker import Faker 
 from usermanagement.models import *
 from organization.models import *
@@ -1153,9 +1155,188 @@ class Test_list_users():
 	# def test_list_users(self):
 	# 	request=reverse("organization:list-users")
 	# 	headers={"HTTP_AUTHORIZATION":""}
-		
-@pytest.mark.xfail				
+
+@pytest.mark.usefixtures("setup_user_for_new_password")						
 class Test_create_usercompanyrole():
+    
+   ##flag=Company-Management 
+    #Test case for create usercompanyrole with all valid data.
+	def test_create_usercompanyrole_with_valid_data(self,client,setup_user_for_new_password):
+		request=reverse("organization:create-usercompanyrole")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getUsers=Users.objects.get(email="testuser1@momenttext.com")
+		data={"company":2,"user":getUsers.id,"flag":"COMPANY-MANAGEMENT","role":2}
+		getUsersRole=UserCompanyRole.objects.count()
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["data"] == getUsersRole+1
+		assert response["isNew"] == True
+		assert response["isReplaced"] == False
+		assert response["message"] == "UserCompanyRole created successfully."
+		assert response["statuscode"] == 200
+
+	#Test case for create usercompanyrole with invalid token.
+	def test_create_usercompanyrole_with_invalid_token(self,client,setup_user_for_new_password):
+		request=reverse("organization:create-usercompanyrole")
+		getUsers=Users.objects.get(email="testuser1@momenttext.com")
+		data=json.dumps({"company":2,"user":getUsers.id,"flag":"COMPANY-MANAGEMENT","role":2})
+		headers={"HTTP_AUTHORIZATION":fake.uuid4()}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+      
+	#Test case for create usercompanyrole with missing/invalid parameter.
+	def test_create_usercompanyrole_with_invalid_parameter(self,client):
+		request=reverse("organization:create-usercompanyrole")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getUsers=Users.objects.get(email="testuser1@momenttext.com")
+		data=json.dumps({"client_id":2,"user":getUsers.id,"flag":"COMPANY-MANAGEMENT","role":2})
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+		getUsers=Users.objects.get(email="testuser1@momenttext.com")
+		data=json.dumps({"company":2,"user":getUsers.id,"role":2})
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+      
+	#Test case for create usercompanyrole with invalid user in parameter.
+	@pytest.mark.parametrize("user,flag,role",[
+		(30,"Project-Management",2),(30,"Project-Management",4),(30,"Company-Management",3)
+		,(40,"Company-Management",2),(40,"Project-Management",3),(40,"Project-Management",4)
+		,(50,"Project-Management",3),(50,"Company-Management",2),(50,"Company-Management",3)
+		,(60,"Company-Management",4),(60,"Project-Management",3),(60,"Company-Management",4)])
+	def test_create_usercompanyrole_with_invalid_user(self,client,user,flag,role):
+		request=reverse("organization:create-usercompanyrole")
+		data=json.dumps({"company":2,"user":user,"flag":flag,"role":role})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="User with the provided ID is not found in the database."
+      
+	#Test case for create usercompanyrole with invalid role id in parameter.
+	@pytest.mark.parametrize("user,flag,role",[
+		(3,"Project-Management",21),(3,"Project-Management",14),(3,"Company-Management",31)
+		,(4,"Company-Management",12),(4,"Project-Management",33),(4,"Project-Management",44)
+		,(5,"Project-Management",23),(5,"Company-Management",24),(5,"Company-Management",33)
+		,(2,"Company-Management",6),(6,"Project-Management",36),(6,"Company-Management",46)])
+	def test_create_usercompanyrole_with_invalid_role_id(self,client,user,flag,role):
+		request=reverse("organization:create-usercompanyrole")
+		data=json.dumps({"company":2,"user":user,"flag":flag,"role":role})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Role with the provided ID is not found in the database."
+      
+	#Test case for create usercompanyrole with invalid company id in parameter.
+	@pytest.mark.parametrize("company,user,flag,role",[
+		(21,3,"Project-Management",21),(31,3,"Project-Management",14),(41,3,"Company-Management",31)
+		,(44,4,"Company-Management",12),(51,4,"Project-Management",33),(13,4,"Project-Management",44)
+		,(24,5,"Project-Management",23),(45,5,"Company-Management",24),(54,5,"Company-Management",33)])
+	def test_create_usercompanyrole_with_invalid_company_id(self,client,company,user,flag,role):
+		request=reverse("organization:create-usercompanyrole")
+		data=json.dumps({"company":company,"user":user,"flag":flag,"role":role})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Company with the provided ID is not found in the database."
+
+	#Test case for create usercompanyrole with assigning superuser for company admin 
+	@pytest.mark.parametrize("flag",[("COMPANY-MANAGEMENT"),("PROJECT-MANAGEMENT")])
+	def test_create_usercompanyrole_with_superuser_as_company_admin(self,client,flag):
+		request=reverse("organization:create-usercompanyrole")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		data={"company":2,"user":getUsers.id,"flag":flag,"role":2}
+		getUsersRole=UserCompanyRole.objects.count()
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"] == "SUPER-USER cannot be made COMPANY-ADMIN."
+
+	#Test case for create usercompanyrole without user authorization.
+	@pytest.mark.parametrize("email,flag",[("testuser@momenttext.com","Company-Management")
+                                        ,("user@momenttext.com","Project-Management")])
+	def test_create_usercompanyrole_without_authorization(self,client,email,flag):
+		request=reverse("organization:create-usercompanyrole")
+		data=json.dumps({"company":2,"flag":flag,"role":random.randint(2,4)
+			,"user":Users.objects.get(email=email).id})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="You cannot create the UserCompanyRole."
+      
+	#Test case for create usercompanyrole with existing user company role
+	@pytest.mark.usefixtures("setup_create_usercompanyrole_with_existing_companyrole")
+	@pytest.mark.parametrize("flag",[("Company-Management"),("Project-Management")])
+	def test_create_usercompanyrole_with_existing_company(self,client,flag):
+		request=reverse("organization:create-usercompanyrole")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		users=["testuser{}@momenttext.com".format(x) for x in range(1,6)]
+		for user in Users.objects.filter(email__in=users):
+			data=json.dumps({"company":5,"user":user.id,"flag":flag,"role":3})
+			getUserCompanyRole=UserCompanyRole.objects.get(company_id=5,user=user,role_id=3)
+			assert getUserCompanyRole.isActive==False
+			response=client.post(request,data=data,content_type="application/json",**headers)
+			assert response.status_code==200
+			response=response.json()
+			assert response["statuscode"]==200
+			getUserCompanyRole=UserCompanyRole.objects.get(company_id=5,user=user,role_id=3)
+			assert response["data"] == getUserCompanyRole.id
+			assert getUserCompanyRole.isActive==True
+			assert response["isNew"] == False
+			assert response["isReplaced"] == False
+			assert response['message'] == 'UserCompanyRole already existed.'
+			assert response["statuscode"] == 200
+    
+	#Test case for create usercompanyrole with user of different companies 
+	@pytest.mark.parametrize("client_id",[(3),(4),(5),(6),(1),(7)])
+	def test_create_usercompanyrole(self,client,client_id):
+		request=reverse("organization:create-usercompanyrole")
+		getUsers=Users.objects.get(email="companyadmin@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		data={"client_id":client_id,"name":fake.company(),"partner_name":fake.name()
+                  ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
+                  ,"state_pin_code":fake.postalcode(),"country":fake.country()}
+		getCompany=Company.objects.get(id=client_id)
+		assert getCompany.state_pin_code is None
+		assert getCompany.name is not None
+		assert getCompany.city is None
+		assert getCompany.address1 is None
+		assert getCompany.state is None
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["message"]=="Company data updated successfully."
+		getCompany=Company.objects.get(id=client_id)
+		assert getCompany.name==data["name"]
+		assert getCompany.city==data["city"]
+		assert getCompany.address1==data["address1"]
+		assert getCompany.state==data["state"]
+		assert getCompany.state_pin_code==data["state_pin_code"]
+		assert getCompany.country==data["country"]
+		assert getCompany.partner_name==data["partner_name"]
+  				
+    
 	def test_create_usercompanyrole(self,*args, **kwargs):
 		request=reverse("organization:create-usercompanyrole")
 		headers={"HTTP_AUTHORIZATION":""}

@@ -686,6 +686,18 @@ def setup_list_company_byemail(setup_user_for_new_password):
 	except Exception as e:
 		print("Exception at==>",e)
 
-
+@pytest.fixture
+def setup_create_usercompanyrole_with_existing_companyrole(setup_user_for_new_password):
+	users=["testuser{}@momenttext.com".format(x) for x in range(1,6)]
+	getCompany=Company.objects.get(id=5)
+	getRole=Roles.objects.get(id=3)
+	getUser=Users.objects.get(email="su1@momenttext.com")
+	for getUser in Users.objects.filter(email__in=users):
+		getUserCompanyRole = UserCompanyRole.objects.create(user=getUser
+                                ,isActive=False
+                                ,created_by=getUser
+                                ,updated_by=getUser
+								, company=getCompany
+								, role=getRole)
 
 	
