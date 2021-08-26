@@ -23,8 +23,8 @@ class Test_users_models():
 		
 		# assert Users.objects.count()==len(setup_user)+1
 		getUsers=Users.objects.exclude(email__in=["companyadmin@momenttext.com"
-                                            ,"testuser@momenttext.com","user@momenttext.com"
-                                            ,"projectadmin@momenttext.com"])
+											,"testuser@momenttext.com","user@momenttext.com"
+											,"projectadmin@momenttext.com"])
 		for x in range(len(users)):
 			assert getUsers[0].email	== "su1@momenttext.com"
 			assert getUsers[x+1].email	== users[x]["email"]
@@ -110,8 +110,8 @@ class Test_users_models():
 			getAccess=AccessManagement.objects.create(name=getUsers)
 		
 		for user in Users.objects.exclude(email__in=["projectadmin@momenttext.com"
-                                               ,"user@momenttext.com","testuser@momenttext.com"
-                                               ,"companyadmin@momenttext.com"]): 
+											   ,"user@momenttext.com","testuser@momenttext.com"
+											   ,"companyadmin@momenttext.com"]): 
 			getAccess=AccessManagement.objects.get(name__email=user.email)
 			assert getAccess.name.active==True
 			assert getAccess.name.user_verified==True
@@ -136,8 +136,8 @@ class Test_users_models():
 		assert Roles.objects.count()==5
 	
 	@pytest.mark.parametrize("id,role_name",[(1,"SUPER-USER"),(4,"USER")
-                                ,(3,"PROJECT-ADMIN"),(2,"COMPANY-ADMIN")
-                                ,(5,"ADMINS")])
+								,(3,"PROJECT-ADMIN"),(2,"COMPANY-ADMIN")
+								,(5,"ADMINS")])
 	def test_roles(self,id,role_name):
 		assert Roles.objects.count()==4
 		getRoles=Roles.objects.create(role_name="Admins"
@@ -217,7 +217,7 @@ class Test_users_models():
 			assert getActivity[0].user.token==Users.objects.get(email=users[x]["email"]).token
 		
 class Test_worker_models():
-    
+	
 	def test_worker(self,setup_register_worker):
 		getWorker=Workers.objects.get(id=1)
 		assert getWorker.name=="Rohit"		
@@ -242,7 +242,7 @@ class Test_worker_models():
 			assert Workers.objects.count()==6
   
 class Test_access_request_models():
-    
+	
 	def test_worker(self,setup_register_access):
 		getAccessRequest=AccessRequest.objects.get(id=1)
 		assert getAccessRequest.name=="Nitin"		

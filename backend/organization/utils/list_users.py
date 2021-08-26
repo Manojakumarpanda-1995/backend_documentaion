@@ -148,6 +148,11 @@ def func_list_users(request_data, token):
 			response["data"] = data
 			response['message'] = "Users listed successfully."
 			response["statuscode"] = 200
+		else:
+			logs["data"]["status_message"] = "You are not authorized to list users."
+
+			response['message'] = "You are not authorized to list users."
+			response["statuscode"] = 400
 
 		logs["added_at"] = datetime.datetime.utcnow()
 		actvity_logs.insert_one(logs)

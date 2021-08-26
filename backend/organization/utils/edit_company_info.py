@@ -71,9 +71,9 @@ def func_edit_company_info(request_data, token):
 
 			if len(getCompany) == 0:
 				logs["data"]["data_fields"] = [changed_values]
-				logs["data"]["status_message"] = "company information with provided ID doesn't exist."
+				logs["data"]["status_message"] = "Company with provided ID doesn't exist."
 
-				response['message'] = "company information with provided ID doesn't exist."
+				response['message'] = "Company with provided ID doesn't exist."
 				response["statuscode"] = 400
 				logs["added_at"] = datetime.datetime.utcnow()
 				actvity_logs.insert_one(logs)
@@ -97,21 +97,21 @@ def func_edit_company_info(request_data, token):
 				getCompany.save()
 
 				logs["data"]["data_fields"] = [changed_values]
-				logs["data"]["status_message"] = "company information data updated successfully."
+				logs["data"]["status_message"] = "Company information data updated successfully."
 
-				response['message'] = "company information data updated successfully."
+				response['message'] = "Company information data updated successfully."
 				response["statuscode"] = 200
 			
 			else:
 				logs["data"]["data_fields"] = [changed_values]
-				logs["data"]["status_message"] = "company information with provided ID doesn't exist."
+				logs["data"]["status_message"] = "Company information with provided ID doesn't exist."
 
-				response['message'] = "company information with provided ID doesn't exist."
+				response['message'] = "Company information with provided ID doesn't exist."
 				response["statuscode"] = 400
 		else:
 			logs["data"]["status_message"] = "You are not authorized to edit company information details."
 
-			response['message'] = "You are not authorized to edit company information information details."
+			response['message'] = "You are not authorized to edit company information details."
 			response["statuscode"] = 400
 
 		logs["added_at"] = datetime.datetime.utcnow()
