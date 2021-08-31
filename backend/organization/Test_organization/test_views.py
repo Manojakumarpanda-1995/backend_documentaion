@@ -1159,14 +1159,14 @@ class Test_list_users():
 @pytest.mark.usefixtures("setup_user_for_new_password")						
 class Test_create_usercompanyrole():
     
-   ##flag=Company-Management 
     #Test case for create usercompanyrole with all valid data.
-	def test_create_usercompanyrole_with_valid_data(self,client,setup_user_for_new_password):
+	@pytest.mark.parametrize("flag",[("COMPANY-MANAGEMENT","PROJECT-MANAGEMENT")])
+	def test_create_usercompanyrole_with_valid_data(self,client,flag,setup_user_for_new_password):
 		request=reverse("organization:create-usercompanyrole")
 		getUsers=Users.objects.get(email="su1@momenttext.com")
 		headers={"HTTP_AUTHORIZATION":getUsers.token}
 		getUsers=Users.objects.get(email="testuser1@momenttext.com")
-		data={"company":2,"user":getUsers.id,"flag":"COMPANY-MANAGEMENT","role":2}
+		data={"company":2,"user":getUsers.id,"flag":flag,"role":2}
 		getUsersRole=UserCompanyRole.objects.count()
 		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
 		assert response.status_code==200
@@ -1309,13 +1309,12 @@ class Test_create_usercompanyrole():
     
 	#Test case for create usercompanyrole with user of different companies 
 	@pytest.mark.parametrize("client_id",[(3),(4),(5),(6),(1),(7)])
-	def test_create_usercompanyrole(self,client,client_id):
+	def test_create_usercompanyrole_with_diff_company(self,client,client_id):
 		request=reverse("organization:create-usercompanyrole")
 		getUsers=Users.objects.get(email="companyadmin@momenttext.com")
 		headers={"HTTP_AUTHORIZATION":getUsers.token}
-		data={"client_id":client_id,"name":fake.company(),"partner_name":fake.name()
-                  ,"address1":fake.address(),"city":fake.city(),"state":fake.state()
-                  ,"state_pin_code":fake.postalcode(),"country":fake.country()}
+		data={"user":3,"company":client_id,"role":3
+                  ,"flag":"Company-Management"}
 		getCompany=Company.objects.get(id=client_id)
 		assert getCompany.state_pin_code is None
 		assert getCompany.name is not None
@@ -1326,27 +1325,174 @@ class Test_create_usercompanyrole():
 		assert response.status_code==200
 		response=response.json()
 		assert response["statuscode"]==200
-		assert response["message"]=="Company data updated successfully."
-		getCompany=Company.objects.get(id=client_id)
-		assert getCompany.name==data["name"]
-		assert getCompany.city==data["city"]
-		assert getCompany.address1==data["address1"]
-		assert getCompany.state==data["state"]
-		assert getCompany.state_pin_code==data["state_pin_code"]
-		assert getCompany.country==data["country"]
-		assert getCompany.partner_name==data["partner_name"]
-  				
-    
-	def test_create_usercompanyrole(self,*args, **kwargs):
+		assert response["message"]=="UserCompanyRole created successfully."
+
+	#Test case for create usercompany role with user of a same company with different roles
+	@pytest.mark.usefixtures("setup_create_usercompanyrole_with_existing_companyrole")			
+	@pytest.mark.parametrize("email,role,company,flag",[
+	("testuser1@momenttext.com",3,5,"Company-Management"),("testuser1@momenttext.com",3,5,"Project-Management"),
+	("testuser2@momenttext.com",3,5,"Company-Management"),("testuser2@momenttext.com",3,5,"Project-Management"),
+	("testuser4@momenttext.com",3,5,"Company-Management"),("testuser4@momenttext.com",3,5,"Project-Management"),
+	("testuser5@momenttext.com",3,5,"Company-Management"),("testuser5@momenttext.com",3,5,"Project-Management"),
+	                                                 ])
+	def test_create_usercompanyrole(self,client,email,role,company,flag):
 		request=reverse("organization:create-usercompanyrole")
-		headers={"HTTP_AUTHORIZATION":""}
-				
-@pytest.mark.xfail				
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		getUsers=Users.objects.get(email=email)
+		getCompany=Company.objects.get(id=company)
+		data=json.dumps({"user":getUsers.id,"company":getCompany.id,"role":role,"flag":flag})
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["isNew"] == False
+		assert response["isReplaced"] == False
+		assert response["message"]=="UserCompanyRole already existed."
+
+    				
 class Test_deactivate_usercompanyrole():
-	def test_deactivate_usercompanyrole(self,*args, **kwargs):
+
+	#Test case for deactivate usercompanyrole with data doesn't exist in db
+	@pytest.mark.parametrize("email,role,company",[("testuser1@momenttext.com",2,3)
+                            ,("testuser2@momenttext.com",3,3),("testuser3@momenttext.com",4,3)                    
+                            ,("testuser4@momenttext.com",2,5),("testuser3@momenttext.com",3,2)                    
+                                                ])
+	def test_deactivate_usercompanyrole_invalid_usercompanyrole(self,client,email,role,company,setup_saved_user):
 		request=reverse("organization:deactivate-usercompanyrole")
-		headers={"HTTP_AUTHORIZATION":""}
-		
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		getUsers=Users.objects.get(email=email)
+		data=json.dumps({"user":getUsers.id,"role":role,"company":company})
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="UserCompanyRole doesnot exists."
+
+	#Test case for deactivate usercompanyrole with all valid data.
+	def test_deactivate_usercompanyrole_with_valid_data(self,client):
+		request=reverse("organization:deactivate-usercompanyrole")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getUsers=Users.objects.get(email="companyadmin@momenttext.com")
+		getCompany=Company.objects.get(name="Microsoft")
+		data={"company":getCompany.id,"user":getUsers.id,"role":2}
+		getUsersRole=UserCompanyRole.objects.get(user=getUsers)
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["data"] == getUsersRole.id
+		assert response["message"] == "UserCompanyRole deactivate successfully."
+		assert response["statuscode"] == 200
   
-		
+    #Test case for deactivate usercompanyrole with all valid data.
+	@pytest.mark.parametrize("email,role,company",[("companyadmin@momenttext.com",2,"Microsoft")
+                    ,("testuser@momenttext.com",4,"Microsoft"),("user@momenttext.com",4,"Microsoft")                               
+                                                   ])
+	def test_deactivate_usercompanyrole_with_all_usercompanyrole(self,client,email,role,company):
+		request=reverse("organization:deactivate-usercompanyrole")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getUsers=Users.objects.get(email=email)
+		getCompany=Company.objects.get(name=company)
+		data={"company":getCompany.id,"user":getUsers.id,"role":role}
+		getUsersRole=UserCompanyRole.objects.get(user=getUsers)
+		response=client.post(request,data=json.dumps(data),content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==200
+		assert response["data"] == getUsersRole.id
+		assert response["message"] == "UserCompanyRole deactivate successfully."
+		assert response["statuscode"] == 200
+
+	#Test case for deactivate usercompanyrole with invalid token.
+	def test_deactivate_usercompanyrole_with_invalid_token(self,client):
+		request=reverse("organization:deactivate-usercompanyrole")
+		getUsers=Users.objects.get(email="user@momenttext.com")
+		data=json.dumps({"company":2,"user":getUsers.id,"role":2})
+		headers={"HTTP_AUTHORIZATION":fake.uuid4()}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==403
+      
+	#Test case for deactivate usercompanyrole with missing/invalid parameter.
+	def test_deactivate_usercompanyrole_with_invalid_parameter(self,client):
+		request=reverse("organization:deactivate-usercompanyrole")
+		getUsers=Users.objects.get(email="su1@momenttext.com")
+		headers={"HTTP_AUTHORIZATION":getUsers.token}
+		getUsers=Users.objects.get(email="testuser@momenttext.com")
+		data=json.dumps({"client_id":2,"user":getUsers.id,"role":2})
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+		getUsers=Users.objects.get(email="testuser@momenttext.com")
+		data=json.dumps({"company":2,"user":getUsers.id})
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==500
+      
+	#Test case for deactivate usercompanyrole with invalid user in parameter.
+	@pytest.mark.parametrize("user,flag,role",[
+		(30,"Project-Management",2),(30,"Project-Management",4),(30,"Company-Management",3)
+		,(40,"Company-Management",2),(40,"Project-Management",3),(40,"Project-Management",4)
+		,(50,"Project-Management",3),(50,"Company-Management",2),(50,"Company-Management",3)
+		,(60,"Company-Management",4),(60,"Project-Management",3),(60,"Company-Management",4)])
+	def test_deactivate_usercompanyrole_with_invalid_user(self,client,user,flag,role):
+		request=reverse("organization:deactivate-usercompanyrole")
+		data=json.dumps({"company":2,"user":user,"flag":flag,"role":role})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="User with the provided ID is not found in the database."
+      
+	#Test case for deactivate usercompanyrole with invalid role id in parameter.
+	@pytest.mark.parametrize("user,flag,role",[
+		(3,"Project-Management",21),(3,"Project-Management",14),(3,"Company-Management",31)
+		,(4,"Company-Management",12),(4,"Project-Management",33),(4,"Project-Management",44)
+		,(5,"Project-Management",23),(5,"Company-Management",24),(5,"Company-Management",33)
+		,(2,"Company-Management",6)])
+	def test_deactivate_usercompanyrole_with_invalid_role_id(self,client,user,flag,role):
+		request=reverse("organization:deactivate-usercompanyrole")
+		data=json.dumps({"company":2,"user":user,"flag":flag,"role":role})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Role with the provided ID is not found in the database."
+      
+	#Test case for deactivate usercompanyrole with invalid company id in parameter.
+	@pytest.mark.parametrize("company,user,flag,role",[
+		(21,3,"Project-Management",21),(31,3,"Project-Management",14),(41,3,"Company-Management",31)
+		,(44,4,"Company-Management",12),(51,4,"Project-Management",33),(13,4,"Project-Management",44)
+		,(24,5,"Project-Management",23),(45,5,"Company-Management",24),(54,5,"Company-Management",33)])
+	def test_deactivate_usercompanyrole_with_invalid_company_id(self,client,company,user,flag,role):
+		request=reverse("organization:deactivate-usercompanyrole")
+		data=json.dumps({"company":company,"user":user,"flag":flag,"role":role})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email="su1@momenttext.com").token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="Company with the provided ID is not found in the database."
+  
+	#Test case for deactivate usercompanyrole without user authorization.
+	@pytest.mark.parametrize("email",[("testuser@momenttext.com")
+                                        ,("user@momenttext.com")])
+	def test_deactivate_usercompanyrole_without_authorization(self,client,email):
+		request=reverse("organization:deactivate-usercompanyrole")
+		data=json.dumps({"company":2,"role":random.randint(2,4)
+			,"user":Users.objects.get(email=email).id})
+		headers={"HTTP_AUTHORIZATION":Users.objects.get(email=email).token}
+		response=client.post(request,data=data,content_type="application/json",**headers)
+		assert response.status_code==200
+		response=response.json()
+		assert response["statuscode"]==400
+		assert response["message"]=="You cannot create the UserCompanyRole."
+      	
    

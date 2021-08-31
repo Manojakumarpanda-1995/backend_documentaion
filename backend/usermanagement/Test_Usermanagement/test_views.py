@@ -1,5 +1,5 @@
 import json
-from re import U
+from re
 import string
 import random
 from _pytest.monkeypatch import resolve
@@ -8,14 +8,13 @@ import pytest
 from django import dispatch
 # from usermanagement.utils.store_activity_logs import func_store_activity_logs
 from django.conf import settings
-from django.test.client import Client as client
 from django.urls import reverse
 from django.utils import timezone
 from organization.models import *
 from project.models import *
 from usermanagement.models import *
 from usermanagement.models import AccessManagement, Users
-from usermanagement.utils.hash import (decryption, encryption,
+from usermanagement.utils.hash import (  # decryption, encryption,
 									   generate_passwords)
 from django.conf import settings
 refresh_lockout = getattr(settings, "LOCKOUT_COUNT_RESET_DURATION", None)
@@ -24,6 +23,7 @@ count_threshold = getattr(settings, "INCORRECT_PASSWORD_COUNT_MAX_ATTEMPTS", Non
 from faker import Faker
 
 fake=Faker()
+
 
 class Test_login():
 	
@@ -48,10 +48,7 @@ class Test_login():
 	#This is for request with all valid information
 	@pytest.mark.parametrize("email,password,role,name",[
 		("companyadmin@momenttext.com","Password@1234567","COMPANY-ADMIN","Company Admin")
-		# ,("projectadmin@momenttext.com","Password@1237654","PROJECT-ADMIN","Project Admin")
-		# ,("projectadmin@momenttext.com","Password@1237654","PROJECT-ADMIN","Project Admin")
-		# ,("testuser@momenttext.com","Password@1232424","USER","Test User")
-		# ,("user@momenttext.com","Password@1231212","USER","End User")
+		,("projectadmin@momenttext.com","Password@1237654","PROJECT-ADMIN","Project Admin")
 		])
 	def test_login_with_valid_users(self,client,email,password,role,name):
 		
@@ -65,8 +62,9 @@ class Test_login():
 		assert response["token"]==Users.objects.get(email=email).token
 		assert response["name"]==name
 		assert response["email"]==email
-		assert response["company_id"]== 8
-		assert response["role"]==role
+		assert response["company_id"]== Company.objects.get(name="Microsoft").id
+		assert response["role"].upper()==role.upper()
+		print("Response==>",response)
 
 	#Test case with wrong password		
 	def test_login_with_invalid_data(self,client):
@@ -251,6 +249,7 @@ class Test_login():
 		assert response["statuscode"] == 400
 		assert response["message"] == "Your account is not active. Please click on the link sent to your email at the time of Registration."
 
+
 class Test_reset_password():
 	#Test cases with all valid informations
 	@pytest.mark.parametrize("email",[("testuser1@momenttext.com"),
@@ -381,7 +380,8 @@ class Test_reset_password():
 		assert response.status_code==200
 		response=response.json()
 		assert response["statuscode"] == 500
-				
+
+
 class Test_update_password():
 	
 	#Test cases with all valid information
@@ -574,7 +574,8 @@ class Test_update_password():
 		getAccess=AccessManagement.objects.get(name__email=email)
 		assert response["message"]=="Incorrect OTP."
 		assert getAccess.otp_attempts == 5
-			  
+
+
 class Test_new_password():
 	#Test cases with all valid information
 	@pytest.mark.parametrize("email,password,new_pass",[
@@ -644,7 +645,8 @@ class Test_new_password():
 		assert response.status_code==200
 		response=response.json()
 		assert response["statuscode"]==500
-		  
+
+
 class Test_logout():
 	#Test cases with all valid information
 	@pytest.mark.parametrize("email",[("testuser1@momenttext.com")
@@ -673,7 +675,8 @@ class Test_logout():
 		response=response.json()
 		assert response["statuscode"]==400
 		assert response["message"]=="Invalid token."
-		
+
+
 class Test_check_token():
 
 	#Testing check token with all valid info
@@ -714,7 +717,8 @@ class Test_check_token():
 		response=response.json()
 		assert response["statuscode"]==200
 		assert response["isUser"]==False
-	   
+
+
 class Test_create_role():
 	#Test case for create role api with all valid information
 	def test_create_role_with_valid_data(self,client):
@@ -780,7 +784,8 @@ class Test_create_role():
 		assert response.status_code==200
 		response=response.json()
 		assert response["statuscode"]==500
-		
+
+
 class Test_get_role():
 	#Test case for create role api with all valid information
 	def test_get_role_with_valid_data(self,client):
@@ -851,7 +856,8 @@ class Test_get_role():
 
 	def test_get_role(self,client):
 		request=reverse("usermanagement:get-role")
-	   
+
+
 class Test_register_user():
 	
 	#Test case for register user api with all valid information
@@ -971,7 +977,8 @@ class Test_register_user():
 		response=response.json()
 		assert response["message"]=="You are not authorized to create user."
 		assert response["statuscode"]==400
-	  
+
+
 class Test_register_worker():
 	
 	#Test cases for register worker with all valid data
@@ -1051,6 +1058,7 @@ class Test_register_worker():
 		assert response.status_code==200
 		response=response.json()
 		assert response["statuscode"]==500
+
 			   
 class Test_register_access():
 
@@ -1152,7 +1160,8 @@ class Test_register_access():
 		response=response.json()
 		assert response["statuscode"]==400
 		assert response["message"]=="Company with this name already registered. To claim contact with admin."
-				  
+
+
 class Test_edit_user():
 	
 	#Test cases for edit user request with all valid data
@@ -1265,7 +1274,8 @@ class Test_edit_user():
 		response=response.json()
 		assert response["statuscode"]==400
 		assert response["message"]=="Please try to add valid email."
-	  
+
+
 class Test_edit_user_byid():
 	
 	#Test cases for edit user byid request with all valid data
@@ -1409,7 +1419,8 @@ class Test_edit_user_byid():
 		response=response.json()
 		assert response["statuscode"]==400
 		assert response["message"]=="User with this detail not found."
-  
+
+
 class Test_deactivate_user():
 	
 	#Test cases for deactivate user request with all valid data
@@ -1510,7 +1521,8 @@ class Test_deactivate_user():
 		assert Users.objects.get(id=1).active==False
 		assert response["statuscode"]==200
 		assert response["message"]=="User deactivated successfully."
-		 
+
+
 class Test_list_user_byemail():
 	
 	 #Test cases for listing user byemail request with all valid data
@@ -1623,7 +1635,8 @@ class Test_list_user_byemail():
 		response=response.json()
 		assert response["statuscode"]==200
 		assert response["message"]=="Users listed successfully."
-			  
+
+
 class Test_download_file():
 	def test_download_file(self,client):
 		request=reverse("usermanagement:download-file")

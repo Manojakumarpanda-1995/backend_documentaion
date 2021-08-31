@@ -2,15 +2,17 @@ import random
 import string
 import pytest
 import faker
+import hashlib
 # from usermanagement.utils.store_activity_logs import func_store_activity_logs
 from django.conf import settings
 from django.utils import timezone
 from organization.models import *
 from project.models import *
+from project.models import ActivityLogs as ActivityLog
 from usermanagement.models import *
 from usermanagement.models import AccessManagement, Users
-from usermanagement.utils.hash import (decryption, encryption,
-									   generate_passwords)
+from usermanagement.utils.hash import (decryption, encryption,removeSpecialCharacters
+									   ,generate_passwords)
 
 refresh_lockout = getattr(settings, "LOCKOUT_COUNT_RESET_DURATION", None)
 time_threshold = getattr(settings, "INCORRECT_PASSWORD_COUNT_THRESHOLD", None)
@@ -19,6 +21,7 @@ superuser = getattr(settings, "SUPERUSER", None)
 superuser_pass = getattr(settings, "SUPERUSERPASS", None)
 actvity_logs = getattr(settings, "ACTIVITY_LOGS_DB", None)
 error_logs = getattr(settings, "ERROR_LOGS_DB", None)
+secret = getattr(settings, "SECRET_KEY", None)
 import logging
 import os
 import sys
@@ -31,6 +34,8 @@ pytestmark=pytest.mark.django_db
 def enable_db_access_for_all_tests(db):
 	pass
 
+
+##Setup for the usermanagement
 @pytest.fixture(autouse=True)
 def setup_superusers():
 
@@ -88,6 +93,7 @@ def setup_company(setup_superusers):
 				]	
 		for company in companies:
 			getCompany = Company.objects.create(**company)
+
 			getCompanyInfo,created=CompanyInfo.objects.get_or_create(company=getCompany
 										,created_by=Users.objects.get(id=1)
 										,updated_by=Users.objects.get(id=1))
@@ -100,6 +106,20 @@ def setup_company(setup_superusers):
 			getCompanyInfo.active=True
 			getCompanyInfo.save()
 
+			#Creating project for all company
+			getUser=Users.objects.get(email="su1@momenttext.com")
+			name="{} project1".format(getCompany.name)
+			project_name_hash = hashlib.sha256(" ".join([removeSpecialCharacters(getCompany.name +name)
+                                                , secret]).encode()).hexdigest()
+			getProjectInfo=ProjectInfo.objects.create(project_name_hash =project_name_hash
+				,project_id =fake.uuid4(),name=name
+				,description =fake.text()
+				,catagory =fake.name()
+				,salary_from=int(''.join(random.choice(string.digits) for x in range(4)))
+				,salary_to=int(''.join(random.choice(string.digits) for x in range(4)))
+				,start_date=fake.date(),end_date=fake.date()
+				,start_time=fake.time(),end_time=fake.time(),created_by =getUser,updated_by=getUser)
+   
 	except Exception as e:
 		print("Exception at==>",e)
 
@@ -463,11 +483,11 @@ def setup_user_for_new_password():
 		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
-		,{"first_name":"test","last_name":"user1","email":"testuser7@momenttext.com","active":True
+		,{"first_name":"test","last_name":"user7","email":"testuser7@momenttext.com","active":True
 		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
-		,{"first_name":"test","last_name":"user1","email":"testuser8@momenttext.com","active":True
+		,{"first_name":"test","last_name":"user8","email":"testuser8@momenttext.com","active":True
 		,"user_verified":True,"password":generate_passwords("Password@123"),"token":fake.uuid4()
 		   ,"hashkey":fake.uuid4()[:10],
 		}
@@ -486,7 +506,7 @@ def setup_users_roles(setup_superusers,setup_roles):
 			,"user_verified":True,"password":generate_passwords("Password@1234567"),"token":fake.uuid4()
 			,"hashkey":fake.uuid4()[:10],
 			},
-			{"first_name":"project","last_name":"Admin","email":"projectadmin@momenttext.com","active":True
+			{"first_name":"Project","last_name":"Admin","email":"projectadmin@momenttext.com","active":True
 			,"user_verified":True,"password":generate_passwords("Password@1237654"),"token":fake.uuid4()
 			,"hashkey":fake.uuid4()[:10],
 			},
@@ -503,6 +523,18 @@ def setup_users_roles(setup_superusers,setup_roles):
 		getSuperUser= Users.objects.filter(id=1)[0]
 		company ={"name": "Microsoft","created_by":getSuperUser,"updated_by": getSuperUser}
 		getCompany = Company.objects.create(**company)
+		#Creating project for all company
+		getUser=Users.objects.get(email="su1@momenttext.com")
+		name="{} project1".format(getCompany.name)
+		project_name_hash = hashlib.sha256(" ".join([removeSpecialCharacters(getCompany.name +name)
+                                            , secret]).encode()).hexdigest()
+		getProjectInfo=ProjectInfo.objects.create(project_name_hash =project_name_hash
+			,project_id =fake.uuid4(),name=name
+			,description =fake.text()
+			,catagory =fake.name()
+			,salary_from=int(''.join(random.choice(string.digits) for x in range(4)))
+			,salary_to=int(''.join(random.choice(string.digits) for x in range(4)))
+			,start_time=fake.time(),end_time=fake.time(),created_by =getUser,updated_by=getUser)
 		getCompanyInfo=CompanyInfo.objects.get_or_create(company=getCompany)
 		roles=[2,3,4,4]
 		for x in range(len(users)):
@@ -516,11 +548,15 @@ def setup_users_roles(setup_superusers,setup_roles):
 			companyRole["company"] = getCompany
 			companyRole["role"] = Roles.objects.filter(id=roles[x])[0]
 			getUserCompanyRole = UserCompanyRole.objects.create(**companyRole)
-
+			if roles[x]==3:
+				getProjectUser=ProjectUsers.objects.create(user=getUserCompanyRole,project=getProjectInfo
+                                               ,created_by=getSuperUser,updated_by=getSuperUser)
 		return users
 	except Exception as e:
 		print("Exception at==>",e)
 
+
+##Setup for organizations
 @pytest.fixture
 def setup_test_company(setup_superusers):
 	try:
@@ -700,4 +736,91 @@ def setup_create_usercompanyrole_with_existing_companyrole(setup_user_for_new_pa
 								, company=getCompany
 								, role=getRole)
 
+##Project management
+@pytest.fixture
+def setup_project_info(setup_superusers):
+	try:
+		getProject=[]
+		for company in Company.objects.all():
+      
+			#Creating project for all company
+			getUser=Users.objects.get(email="su1@momenttext.com")
+			name=fake.company()
+			project_name_hash = hashlib.sha256(" ".join([removeSpecialCharacters(company.name +name)
+                                                , secret]).encode()).hexdigest()
+			getProjectInfo=ProjectInfo.objects.create(project_name_hash =project_name_hash
+				,project_id =fake.uuid4(),name=name
+				,description =fake.text(),catagory =fake.name()
+				,salary_from=int(''.join(random.choice(string.digits) for x in range(4)))
+				,salary_to=int(''.join(random.choice(string.digits) for x in range(4)))
+				,start_date=fake.date(),end_date=fake.date()
+				,start_time=fake.time(),end_time=fake.time(),created_by =getUser,updated_by=getUser)
+			getProject.append(name)
+		return getProject
+	except Exception as e:
+		print("Exception at==>",e)
+  
+@pytest.fixture
+def setup_projectusers(setup_user_for_new_password):
+	try:
+		getProject=[]
+		getSuperUser=Users.objects.get(email="su1@momenttext.com")
+		getCompany=Company.objects.all()
+		for project in ProjectInfo.objects.all():
+      
+			for x in range(1,len(getCompany)+1):
+				getUser=Users.objects.get(email="testuser{}@momenttext.com".format(x))
+				getUserCompanyRole=UserCompanyRole.objects.create(role_id=3
+                                                      ,user=getUser,created_by=getSuperUser
+                                                      ,company_id=x,updated_by=getSuperUser)
+				getProjectUsers=ProjectUsers.objects.create(project=project,user=getUserCompanyRole
+                                                ,created_by=getSuperUser,updated_by=getSuperUser)
+				
+		return getProject
+	except Exception as e:
+		print("Exception at==>",e)
+
+@pytest.fixture
+def setup_fileupload():
+    
+	file_names=[]
+	for obj in range(5):
+		file_name={"original_file_name" :fake.file_name(category="file",extension='.xlsx')
+			,"datafile":fake.file_path(depth=2,category="file",extension='xlsx')
+			,"function_type" :fake.text(max_nb_chars=10),"created_by_id":1}
+		getFileUpload=FileUpload.objects.create(**file_name)
+		file_names.append(file_name)
+	return file_names
+
+@pytest.fixture
+def setup_project_activitylog(setup_projectusers):
+    
+	activity_logs=[]
+	for projectuser in ProjectUsers.objects.all():
+		activity={"project_user":projectuser,"timestamp":datetime.now(tz=timezone.utc)
+			,"activity":fake.text(max_nb_chars=100),"ip_address":fake.ipv4()}
+		getActivityLogs=ActivityLog.objects.create(**activity)
+		activity_logs.append(activity)
+	return activity_logs
+
+@pytest.fixture
+def setup_filedownload():
+    
+	file_names=[]
+	for obj in range(5):
+		file_name={"unique_string" :fake.text(max_nb_chars=200)
+			,"datafile":fake.file_path(depth=2,category="file",extension='xlsx')
+			,"function_type" :fake.text(max_nb_chars=10)}
+		getFileDownload=DownloadFile.objects.create(**file_name)
+		file_names.append(file_name)
+	return file_names
+
+@pytest.fixture
+def setup_getprogress(setup_saved_user):
+    
+	file_names=[]
+	for user in Users.objects.all():
+		getGetProgress=GetProgress.objects.create(user=user)		
 	
+
+
