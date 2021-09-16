@@ -78,12 +78,13 @@ def func_check_token(request_data, token):
             if isEverythingOk:
                 logs["data"]["status_message"] = "Valid token."
                 logs["data"]["company_id"] = company_id
+                response["user_id"] = curr_user.id
                 response["isUser"] = True
                 response["role"] = role
                 response["statuscode"] = 200
             else:
                 logs["data"]["status_message"] = "Invalid token."
-
+                response["user_id"] = curr_user.id
                 response["isUser"] = False
                 response["statuscode"] = 200
 

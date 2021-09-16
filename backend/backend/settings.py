@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'usermanagement',#.apps.usermanagementConfig',
     'organization',
     'project',
+    'chatbox',
     "rest_framework_swagger",
     "drf_yasg",
 ]
@@ -124,8 +125,8 @@ DATABASES = {
         #     # "host": "0.0.0.0",
         #     # "port": 3306,
         #     # "host": "mysql1",
-        #     "host": "backend_mysql",
-        #     "password": "newP@ssw0rd@1234567@"
+        #     "host": "backend_ml",  # container name
+        #     "password": "newP@ssw0rd"
         # },
     }
 }
@@ -225,8 +226,8 @@ MEDIA_URL = '/static/media_files/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media_files')
 
 EMAIL_IP = "smtp.gmail.com"
-EMAIL = "noreply@momenttext.com"
-EMAIL_PASSWORD = "ydg8K(v!XM-9Zuaw"
+EMAIL = "noreply@mom.com"
+EMAIL_PASSWORD = "ydg8K(v!XM-"
 EMAIL_USERNAME = "Backend Alert"
 # EMAIL_IP = "mail.privateemail.com"
 EMAIL_USE_SSL = True
@@ -247,7 +248,7 @@ FILE_DOWNLOAD_URL_EXPIRY = 60 #secs
 
 VERIFICATION_LINK_EXPIRY_DURATION = 30 #mins
 
-CELERY_BROKER_URL = 'amqp://backend:r@bb@tP@ssw0rd@1233456@@backend_rabbit'
+CELERY_BROKER_URL = 'amqp://backend:r@bb@tP@ssw0rd@1@@backend_rabbit'
 
 VERIFICATION_LINK_EXPIRY_DURATION = 30 #mins
 

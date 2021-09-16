@@ -14,16 +14,14 @@ class CheckToken:
 		try:
 			# logging.info(request.META)
 			# print("request_meta==",request.META)
-			# if request.META["REQUEST_URI"].strip("/").split("/")[-1] not in ["loginapi"
-			# 			,"register-user"
-			# 			,"reset-password","logout"
-			# 			,"update-password"] and request.META["REQUEST_METHOD"] == "POST":
-			
-			if request.META["PATH_INFO"].strip("/").split("/")[-1] not in ["loginapi"
-						,"register-user","register-worker"
-						,"reset-password","logout","register-access-request"
-						,"update-password"] and request.META["REQUEST_METHOD"] == "POST":
-			
+			if request.META["REQUEST_URI"].strip("/").split("/")[-1] not in ["loginapi"
+											,"register-user","get-chat-history"
+											,"reset-password","register-access-request"
+											,"logout","register-worker","get-channel-id"
+											,"save-chats","remove-channel-id"
+											,"list-chat-history","save-channel-id"
+											,"list-channel-id","map-channel-id"
+											,"update-password"] and request.META["REQUEST_METHOD"] == "POST":
 				# logging.info(request.META.get("HTTP_AUTHORIZATION",0))
 				# logging.info(request.META.get("HTTP_AUTHORIZATION",0))
 				request_data = {"token":request.META.get("HTTP_AUTHORIZATION",0)}
@@ -45,8 +43,7 @@ class CheckToken:
 						logging.info("ERROR1->"+str(e))
 						return JsonResponse({"statuscode":403})   
 			#Checks if the user is verified for Login API
-			# elif request.META["REQUEST_URI"].strip("/") == "loginapi" and request.META["REQUEST_METHOD"] == "POST":
-			elif request.META["PATH_INFO"].strip("/") == "loginapi" and request.META["REQUEST_METHOD"] == "POST":
+			elif request.META["REQUEST_URI"].strip("/") == "loginapi" and request.META["REQUEST_METHOD"] == "POST":
 				if "application/x-www-form-urlencoded" in request.META["CONTENT_TYPE"]:
 					# logging.info("Login API")
 					# logging.info(getattr(request, '_body', request.body))
@@ -74,8 +71,7 @@ class CheckToken:
 					return JsonResponse({"statuscode":403})   
 			#Only verfied users will be able to use download file APIs.
 			#This middleware only checks getfile GET API request, all other GET APIs are passed
-			elif (request.META["PATH_INFO"].strip("/") == "download-file" and request.META["REQUEST_METHOD"] == "GET"):      
-			# elif (request.META["REQUEST_URI"].strip("/") == "download-file" and request.META["REQUEST_METHOD"] == "GET"):      
+			elif (request.META["REQUEST_URI"].strip("/") == "download-file" and request.META["REQUEST_METHOD"] == "GET"):      
 				try:
 					token = request.META["HTTP_AUTHORIZATION"]
 					curr_user = Users.objects.filter(token=token)[0]

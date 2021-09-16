@@ -1,0 +1,7 @@
+new col for chat session table which will store the user to whome we will chat
+table with columns=c.s[sender,user,session-id,project,company,]
+
+new api for listing user those are online
+	user channel=[user,channel_id,status,timestamp,
+chat history
+	[session_id,conv_id,user,messsage,read/unread,status,timestamp]
