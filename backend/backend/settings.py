@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'chatbox',
     "rest_framework_swagger",
     "drf_yasg",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -222,7 +223,7 @@ STATIC_ROOT = os.path.join(VENV_PATH, 'static')
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 LOGIN_REDIRECT_URL = '/'
-MEDIA_URL = '/static/media_files/'
+MEDIA_URL = '/media_files/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media_files')
 
 EMAIL_IP = "smtp.gmail.com"
